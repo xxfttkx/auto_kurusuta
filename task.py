@@ -1,0 +1,166 @@
+import threading
+import time
+from utils import log, click_window, screenshot_window, get_rgb_image
+import cv2
+import numpy as np
+
+ 
+class Task:
+    def __init__(self, name, controller):
+        self.name = name
+        self.controller = controller
+        self.enabled = True   # 任务是否启用
+    
+    def check_and_run(self):
+        """每个任务实现：判断是否该执行 + 执行操作"""
+        raise NotImplementedError
+    
+    def match_template(self, image, times = 10, delay = 1, threshold=0.5):
+        count = 0
+        while count<times:
+            self.controller.activate_target_window()
+            screenshot = screenshot_window(self.controller.target_window)
+            res = cv2.matchTemplate(screenshot, image, cv2.TM_CCOEFF_NORMED)
+            _, max_val, _, max_loc = cv2.minMaxLoc(res)
+            x, y = max_loc
+            h, w = image.shape[:2]
+            log(f"[{self.name}] 匹配位置: ({x}, {y}), 尺寸: ({w}, {h})")
+            log(f"[{self.name}] 匹配度: {max_val:.2f}, 位置: {max_loc}")
+            if max_val > threshold:  # 匹配度阈值
+                # 画出匹配到的矩形框，便于调试
+                cv2.rectangle(screenshot, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                cv2.imwrite("debug_match.png", cv2.cvtColor(screenshot, cv2.COLOR_RGB2BGR))  # 或保存到文件
+                log(f"[{self.name}] 识别到开始按钮，点击进入游戏")
+                self.controller.click(x+int(w/2), y+int(h/2))
+                return True
+            else:
+                cv2.rectangle(screenshot, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                cv2.imwrite("debug_match_failed.png", cv2.cvtColor(screenshot, cv2.COLOR_RGB2BGR))  # 或保存到文件
+                log(f"[{self.name}] 识别失败")
+            count+=1
+            time.sleep(delay)
+        return False
+
+class EnterGameTask(Task):
+    def __init__(self, name, controller):
+        super().__init__(name, controller)
+        # 提前加载按钮模板（比如 start_button.png）
+            # 提前加载按钮模板并转换成 RGB
+        self.start_btn = cv2.cvtColor(
+            cv2.imread("assets/start_button.png", cv2.IMREAD_COLOR),
+            cv2.COLOR_BGR2RGB
+        )
+        self.hai_btn = cv2.cvtColor(
+            cv2.imread("assets/hai_button.png", cv2.IMREAD_COLOR),
+            cv2.COLOR_BGR2RGB
+        )
+    
+    def check_and_run(self):
+        if not self.enabled:
+            return
+        self.match_template(self.start_btn)
+        time.sleep(1)
+        self.match_template(self.hai_btn)
+
+
+class SkipTask(Task):
+    def __init__(self, name, controller):
+        super().__init__(name, controller)
+        # 提前加载按钮模板（比如 start_button.png）
+        self.skip_btn = cv2.cvtColor(
+            cv2.imread("assets/skip_button.png", cv2.IMREAD_COLOR),
+            cv2.COLOR_BGR2RGB
+        )
+
+    def check_and_run(self):
+        if not self.enabled:
+            return
+        for i in range(10):  # 循环 10 次
+            self.match_template(self.skip_btn, threshold=0.5)
+            time.sleep(1)  # 每次间隔 1 秒
+
+class CloseTask(Task):
+    def __init__(self, name, controller):
+        super().__init__(name, controller)
+        # 提前加载按钮模板（比如 start_button.png）
+        self.btn = cv2.cvtColor(
+            cv2.imread("assets/close_btn.png", cv2.IMREAD_COLOR),
+            cv2.COLOR_BGR2RGB
+        )
+
+    def check_and_run(self):
+        if not self.enabled:
+            return
+        for i in range(5):  # 循环 10 次
+            self.match_template(self.btn, threshold=0.5)
+            time.sleep(1)  # 每次间隔 1 秒
+
+class RewardTask(Task):
+    def __init__(self, name, controller):
+        super().__init__(name, controller)
+        self.btn = cv2.cvtColor(
+            cv2.imread("assets/reward_btn.png", cv2.IMREAD_COLOR),
+            cv2.COLOR_BGR2RGB
+        )
+        self.close_btn = get_rgb_image("assets/close_btn.png")
+
+    def check_and_run(self):
+        if not self.enabled:
+            return
+        self.match_template(self.btn, threshold=0.5)
+        time.sleep(5)  # 等待 1 秒，确保界面稳定
+        self.match_template(self.close_btn, threshold=0.5)
+
+class DailyTask(Task):
+    def __init__(self, name, controller):
+        super().__init__(name, controller)
+        self.quest_btn = get_rgb_image("assets/quest_btn.png")
+        self.daily_1_btn = get_rgb_image("assets/daily_1.png")
+        self.skip_daily_1 = get_rgb_image("assets/skip_daily_1.png")
+        self.ok = get_rgb_image("assets/ok.png")
+        self.hai = get_rgb_image("assets/hai.png")
+        self.return_btn = get_rgb_image("assets/return.png")
+        self.daily_2_btn = get_rgb_image("assets/daily_2.png")
+        self.skip_daily_2 = get_rgb_image("assets/skip_daily_2.png")
+        self.home = get_rgb_image("assets/home.png")
+
+    def check_and_run(self):
+        if not self.enabled:
+            return
+        self.match_template(self.quest_btn, threshold=0.5)
+        self.match_template(self.daily_1_btn, threshold=0.5)
+        self.match_template(self.skip_daily_1, threshold=0.5)
+        self.match_template(self.ok, threshold=0.5)
+        time.sleep(1)  # 等待 1 秒，确保界面稳定
+        self.match_template(self.hai, threshold=0.5)
+        time.sleep(5)
+        for _ in range(5):
+            time.sleep(1)
+            self.controll
+        self.match_template(self.return_btn, threshold=0.5)
+        self.match_template(self.daily_2_btn, threshold=0.5)
+        self.match_template(self.skip_daily_2, threshold=0.5)
+        time.sleep(1)
+        self.controller.click(700, 420)
+        time.sleep(1)
+        self.match_template(self.ok, threshold=0.5)
+        time.sleep(1)  # 等待 1 秒，确保界面稳定
+        self.match_template(self.hai, threshold=0.5)
+        for _ in range(5):
+            time.sleep(1)
+            self.controller.click(640, 620)
+
+        self.match_template(self.home, threshold=0.5)
+
+class DailyRewardTask(Task):
+    def __init__(self, name, controller):
+        super().__init__(name, controller)
+        self.mission = get_rgb_image("assets/mission.png")
+        self.receive = get_rgb_image("assets/receive.png")
+
+    def check_and_run(self):
+        if not self.enabled:
+            return
+        self.match_template(self.mission, threshold=0.5)
+        time.sleep(1)  # 等待 1 秒，确保界面稳定
+        self.match_template(self.receive, threshold=0.5)
