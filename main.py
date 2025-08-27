@@ -24,14 +24,15 @@ class TaskController:
 
     def run_once(self):
         """每帧只运行当前任务"""
-        if self.current_task_index >= len(self.tasks):
-            return  # 全部任务完成
+        while True:
+            if self.current_task_index >= len(self.tasks):
+                return  # 全部任务完成
 
-        current_task = self.tasks[self.current_task_index]
-        finished = current_task.check_and_run()
+            current_task = self.tasks[self.current_task_index]
+            finished = current_task.check_and_run()
 
-        if finished:  # 返回 True 表示任务完成
-            self.current_task_index += 1
+            if finished:  # 返回 True 表示任务完成
+                self.current_task_index += 1
 
     def click(self, x, y):
         click_window(self.target_window, x, y)
@@ -62,11 +63,11 @@ def main():
     # screenshot_window(target_window)
     controller = TaskController(target_window)
     keyboard.add_hotkey('/', controller.exit_program)
-    # controller.add_task(task.EnterGameTask, "进入游戏")
-    # controller.add_task(task.SkipTask, "跳过奖励")
-    # controller.add_task(task.CloseTask, "关闭公告")
-    # controller.add_task(task.RewardTask, "领取奖励")
-    # controller.add_task(task.DailyTask, "日常")
+    controller.add_task(task.EnterGameTask, "进入游戏")
+    controller.add_task(task.SkipTask, "跳过奖励")
+    controller.add_task(task.CloseTask, "关闭公告")
+    controller.add_task(task.RewardTask, "领取奖励")
+    controller.add_task(task.DailyTask, "日常")
     controller.add_task(task.DailyRewardTask, "领取日常奖励")
     controller.run_once()  # 先运行一次，初始化任务状态
     log("所有任务完成")
