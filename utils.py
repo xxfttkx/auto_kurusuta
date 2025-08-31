@@ -242,6 +242,30 @@ def click_window(window, x, y):
     screen_x, screen_y = win32gui.ClientToScreen(window._hWnd, (x, y))
     pyautogui.click(screen_x, screen_y)
 
+def drag_window(window, x1, y1, x2, y2, duration=0.5):
+    """
+    在指定窗口客户区 (x, y) 按下鼠标左键，拖动 (dx, dy)，然后放开。
+    
+    :param window: 目标窗口对象，必须有 _hWnd
+    :param x, y:   客户区内的起点坐标
+    :param dx, dy: 拖动的偏移量（相对起点）
+    :param duration: 拖动持续时间（秒）
+    """
+    # 客户区坐标转屏幕坐标
+    start_x, start_y = point_add_win((x1, y1), window)
+    end_x, end_y = point_add_win((x2, y2), window)
+
+    # 移动到起点并按下鼠标
+    pyautogui.moveTo(start_x, start_y)
+    pyautogui.mouseDown()
+
+    # 拖动到目标位置
+    pyautogui.moveTo(end_x, end_y, duration=duration)
+
+    # 放开鼠标
+    pyautogui.mouseUp()
+
+
 def get_rgb_image(image_path):
     """
     从文件读取图像并转换为 RGB 格式

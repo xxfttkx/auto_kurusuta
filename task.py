@@ -168,3 +168,32 @@ class DailyRewardTask(Task):
         time.sleep(1)  # 等待 1 秒，确保界面稳定
         self.match_template(self.receive, threshold=0.5)
         return True
+
+class AutoBattleTask(Task):
+    def __init__(self, name, controller):
+        super().__init__(name, controller)
+        self.battle = get_rgb_image("assets/chuji.png")
+        self.winner = get_rgb_image("assets/winner.png")
+        self.skip = get_rgb_image("assets/skip_button.png")
+
+    def check_and_run(self):
+        if not self.enabled:
+            return
+        x1,y1 = self.controller.get_point(0.7, 0.38)
+        x2,y2 = self.controller.get_point(0.7, 0.8)
+        while True:
+            self.controller.drag(x1, y1, x2, y2, duration=0.2)
+            time.sleep(0.2)
+            self.controller.click(x1,y1)
+            time.sleep(3)
+            if self.match_template(self.skip, times = 5, delay = 1, threshold=0.5):
+                break
+            self.match_template(self.battle, threshold=0.5)
+            time.sleep(20)  # 等待 10 秒，确保战斗开始
+            self.match_template(self.winner, times = 5, delay = 20, threshold=0.5)
+            time.sleep(1)  # 等待 1 秒，确保界面稳定
+            for _ in range(4):
+                time.sleep(1)
+                self.controller.click(*self.controller.get_point(0.9, 0.9))
+            time.sleep(5)  # 等待 1 秒，确保界面稳定
+        return True
