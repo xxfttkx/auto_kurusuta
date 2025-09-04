@@ -1,4 +1,5 @@
 # main.py
+import argparse
 import ctypes
 import time
 from task_controller import TaskController
@@ -23,7 +24,22 @@ TASKS = {
     "autobattle": task.AutoBattleTask,
 }
 
-def main(selected_tasks=None):
+def main():
+    parser = argparse.ArgumentParser(description="任务执行器")
+    parser.add_argument("tasks", nargs="*", help="要执行的任务（留空则执行全部）")
+    parser.add_argument("--list", action="store_true", help="列出所有可用任务")
+
+    args = parser.parse_args()
+
+    if args.list:
+        print("可用任务:")
+        for key in TASKS.keys():
+            print(f"  {key}")
+        sys.exit(0)
+
+    run_tasks(args.tasks)
+
+def run_tasks(selected_tasks=None):
     target_window = find_target_window()
     while target_window is None:
         log("请先启动游戏")
@@ -62,5 +78,4 @@ if __name__ == '__main__':
     ctypes.windll.shcore.SetProcessDpiAwareness(2)
     sys.stdout.reconfigure(encoding='utf-8')
     # pyautogui.FAILSAFE = False
-    args = sys.argv[1:]  # 读取命令行参数
-    main(args)
+    main()
