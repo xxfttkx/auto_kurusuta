@@ -7,6 +7,9 @@ class TaskController:
         self.height = 720
         self.width = 1280
     
+    def default_size(self):
+        return (1280, 720)
+    
     def get_point(self, x_ratio, y_ratio):
         """根据窗口大小和比例获取坐标"""
         x = int(self.width * x_ratio)
@@ -32,7 +35,7 @@ class TaskController:
     def click(self, x, y):
         """1080*720 的逻辑坐标，自动缩放到窗口实际分辨率""" 
         w, h = get_client_size(self.target_window)
-        real_x = int(x * w / 1080)
+        real_x = int(x * w / 1280)
         real_y = int(y * h / 720)
         click_window(self.target_window, real_x, real_y)
     
