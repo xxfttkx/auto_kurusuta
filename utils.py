@@ -46,6 +46,14 @@ def get_client_rect(win):
     right_bottom = win32gui.ClientToScreen(hwnd, (right, bottom))
     return (left_top[0], left_top[1], right_bottom[0], right_bottom[1])
 
+def get_client_size(win):
+    """返回窗口客户区的 (width, height)"""
+    hwnd = win._hWnd
+    left, top, right, bottom = win32gui.GetClientRect(hwnd)
+    width = right - left
+    height = bottom - top
+    return width, height
+
 def ltrb_add_win(rect, win):
     """将窗口位置添加到给定的 (left, top, right, bottom) 矩形"""
     left, top, right, bottom = rect

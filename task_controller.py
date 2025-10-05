@@ -30,7 +30,11 @@ class TaskController:
                 self.current_task_index += 1
 
     def click(self, x, y):
-        click_window(self.target_window, x, y)
+        """1080*720 的逻辑坐标，自动缩放到窗口实际分辨率""" 
+        w, h = get_client_size(self.target_window)
+        real_x = int(x * w / 1080)
+        real_y = int(y * h / 720)
+        click_window(self.target_window, real_x, real_y)
     
     def drag(self, x1, y1, x2, y2, duration=0.5):
         drag_window(self.target_window, x1, y1, x2, y2, duration)
