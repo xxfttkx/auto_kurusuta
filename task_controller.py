@@ -4,10 +4,9 @@ class TaskController:
         self.target_window = target_window
         self.tasks = []
         self.current_task_index = 0
-        self.height = 720
-        self.width = 1280
+        self.width, self.height = self.get_default_size()
     
-    def default_size(self):
+    def get_default_size(self):
         return (1280, 720)
     
     def get_point(self, x_ratio, y_ratio):
@@ -35,8 +34,8 @@ class TaskController:
     def click(self, x, y):
         """1080*720 的逻辑坐标，自动缩放到窗口实际分辨率""" 
         w, h = get_client_size(self.target_window)
-        real_x = int(x * w / 1280)
-        real_y = int(y * h / 720)
+        real_x = int(x * w / self.width)
+        real_y = int(y * h / self.height)
         click_window(self.target_window, real_x, real_y)
     
     def drag(self, x1, y1, x2, y2, duration=0.5):
