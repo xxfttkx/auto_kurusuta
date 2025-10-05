@@ -20,6 +20,7 @@ class Task:
         while count<times:
             self.controller.activate_target_window()
             screenshot = screenshot_window(self.controller.target_window)
+            screenshot = cv2.resize(screenshot, (1080, 720))
             res = cv2.matchTemplate(screenshot, image, cv2.TM_CCOEFF_NORMED)
             _, max_val, _, max_loc = cv2.minMaxLoc(res)
             x, y = max_loc
