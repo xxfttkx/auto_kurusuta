@@ -181,7 +181,7 @@ class ReceivePresentTask(Task):
         self.match_template(self.present, threshold=0.5)
         time.sleep(1)
         self.match_template(self.receive, threshold=0.5)
-        time.sleep(1)
+        time.sleep(2)
         self.match_template(self.close, threshold=0.5)
         time.sleep(1)
         self.match_template(self.close, threshold=0.5)
@@ -215,3 +215,26 @@ class AutoBattleTask(Task):
                 self.controller.click(*self.controller.get_point(0.9, 0.9))
             time.sleep(5)  # 等待 1 秒，确保界面稳定
         return True
+    
+class BackToHomeTask:
+    def __init__(self, name, controller):
+        super().__init__(name, controller)
+        self.home = get_rgb_image("assets/home.png")
+
+    def check_and_run(self):
+        self.match_template(self.home, threshold=0.5)
+        return True
+
+class DelayTask(Task):
+    def __init__(self, name, controller, delay_seconds=5):
+        super().__init__(name, controller)
+        self.delay_seconds = delay_seconds
+        self.start_time = None
+
+    def check_and_run(self):
+        if self.start_time is None:
+            self.start_time = time.time()
+            log(f"[{self.name}] 开始等待 {self.delay_seconds} 秒")
+        time.sleep(self.delay_seconds)
+        log(f"[{self.name}] 等待完成")
+        return True  # 任务完成
