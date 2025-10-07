@@ -249,6 +249,12 @@ def click_window(window, x, y):
     """
     screen_x, screen_y = win32gui.ClientToScreen(window._hWnd, (x, y))
     pyautogui.click(screen_x, screen_y)
+    # x,y = screen_x, screen_y
+    # hwnd = window._hWnd
+    # lParam = (y << 16) | x  # 将坐标打包为一个整数
+    # # 模拟鼠标按下和抬起
+    # win32gui.PostMessage(hwnd, win32con.WM_LBUTTONDOWN, win32con.MK_LBUTTON, lParam)
+    # win32gui.PostMessage(hwnd, win32con.WM_LBUTTONUP, 0, lParam)
 
 def drag_window(window, x1, y1, x2, y2, duration=0.5):
     """
