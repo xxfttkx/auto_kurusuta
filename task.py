@@ -170,6 +170,23 @@ class DailyRewardTask(Task):
         self.match_template(self.receive, threshold=0.5)
         return True
 
+class ReceivePresentTask(Task):
+    def __init__(self, name, controller):
+        super().__init__(name, controller)
+        self.present = get_rgb_image("assets/present.png")
+        self.receive = get_rgb_image("assets/present_receive.png")
+        self.close = get_rgb_image("assets/close_btn.png")
+
+    def check_and_run(self):
+        self.match_template(self.present, threshold=0.5)
+        time.sleep(1)
+        self.match_template(self.receive, threshold=0.5)
+        time.sleep(1)
+        self.match_template(self.close, threshold=0.5)
+        time.sleep(1)
+        self.match_template(self.close, threshold=0.5)
+        return True
+
 class AutoBattleTask(Task):
     def __init__(self, name, controller):
         super().__init__(name, controller)

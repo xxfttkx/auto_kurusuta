@@ -21,6 +21,7 @@ TASKS = {
     "reward": task.RewardTask,
     "daily": task.DailyTask,
     "dailyreward": task.DailyRewardTask,
+    "receive_present": task.ReceivePresentTask,
     "autobattle": task.AutoBattleTask,
 }
 
@@ -68,8 +69,6 @@ def run_tasks(selected_tasks=None):
         controller.add_task(task.RewardTask, "领取奖励")
         controller.add_task(task.DailyTask, "日常")
         controller.add_task(task.DailyRewardTask, "领取日常奖励")
-
-    
     # controller.add_task(task.AutoBattleTask, "自动战斗")
     controller.run_once()  # 先运行一次，初始化任务状态
     log("所有任务完成")
