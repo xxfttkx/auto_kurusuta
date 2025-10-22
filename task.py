@@ -32,7 +32,6 @@ class Task:
                     cv2.rectangle(screenshot, (x, y), (x + w, y + h), (0, 255, 0), 2)
                     cv2.imwrite("debug_match.png", cv2.cvtColor(screenshot, cv2.COLOR_RGB2BGR))  # 或保存到文件
                 log(f"[{self.name}] 识别成功")
-                self.controller.click(x+int(w/2), y+int(h/2))
                 return True
             else:
                 if self.controller.is_testing:
