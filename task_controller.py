@@ -5,6 +5,7 @@ class TaskController:
         self.tasks = []
         self.current_task_index = 0
         self.width, self.height = self.get_default_size()
+        self.is_testing = False  # 是否为测试模式
     
     def get_default_size(self):
         return (1280, 720)

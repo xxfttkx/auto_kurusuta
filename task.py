@@ -15,6 +15,34 @@ class Task:
         """每个任务实现：判断是否该执行 + 执行操作"""
         raise NotImplementedError
     
+    def match_template_but_not_click(self, image, times = 5, delay = 1, threshold=0.5):
+        count = 0
+        while count<times:
+            self.controller.activate_target_window()
+            screenshot = screenshot_window(self.controller.target_window)
+            screenshot = cv2.resize(screenshot, self.controller.get_default_size())
+            res = cv2.matchTemplate(screenshot, image, cv2.TM_CCOEFF_NORMED)
+            _, max_val, _, max_loc = cv2.minMaxLoc(res)
+            x, y = max_loc
+            h, w = image.shape[:2]
+            log(f"[{self.name}] {count}. 匹配度: {max_val:.2f}, 位置: {max_loc}，匹配位置: ({x}, {y}), 尺寸: ({w}, {h})")
+            if max_val > threshold:  # 匹配度阈值
+                # 画出匹配到的矩形框，便于调试
+                if self.controller.is_testing:
+                    cv2.rectangle(screenshot, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                    cv2.imwrite("debug_match.png", cv2.cvtColor(screenshot, cv2.COLOR_RGB2BGR))  # 或保存到文件
+                log(f"[{self.name}] 识别成功")
+                self.controller.click(x+int(w/2), y+int(h/2))
+                return True
+            else:
+                if self.controller.is_testing:
+                    cv2.rectangle(screenshot, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                    cv2.imwrite("debug_match_failed.png", cv2.cvtColor(screenshot, cv2.COLOR_RGB2BGR))  # 或保存到文件
+                log(f"[{self.name}] 识别失败")
+            count+=1
+            time.sleep(delay)
+        return False
+    
     def match_template(self, image, times = 5, delay = 1, threshold=0.5):
         count = 0
         while count<times:
