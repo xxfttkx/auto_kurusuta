@@ -23,6 +23,7 @@ TASKS = {
     "dailyreward": task.DailyRewardTask,
     "receive_present": task.ReceivePresentTask,
     "autobattle": task.AutoBattleTask,
+    "tower": task.TowerTask,
 }
 
 def main():
@@ -62,7 +63,7 @@ def run_tasks(selected_tasks=None):
             else:
                 log(f"未知任务: {name}")
     else:
-        # 没传参数，默认执行全部
+        # 没传参数，默认执行
         controller.add_task(task.EnterGameTask, "进入游戏")
         controller.add_task(task.SkipTask, "跳过奖励")
         controller.add_task(task.CloseTask, "关闭公告")

@@ -156,6 +156,47 @@ class DailyTask(Task):
         self.match_template(self.home, threshold=0.5)
         return True
 
+class TowerTask(Task):
+    def __init__(self, name, controller):
+        super().__init__(name, controller)
+        self.quest_btn = get_rgb_image("assets/quest_btn.png")
+        self.tower = get_rgb_image("assets/tower.png")
+        self.ok = get_rgb_image("assets/ok.png")
+        self.hai = get_rgb_image("assets/hai.png")
+        self.return_btn = get_rgb_image("assets/return.png")
+        self.chuji = get_rgb_image("assets/chuji.png")
+        self.winner = get_rgb_image("assets/winner.png")
+        self.home = get_rgb_image("assets/home.png")
+        self.tower_btn_pos = [(259,280),(479,280),(699,280),(919,280),(1139,280)]
+
+    def check_and_run(self):
+        if not self.enabled:
+            return
+        self.match_template(self.quest_btn, threshold=0.5)
+        time.sleep(1)
+        if self.match_template(self.tower, threshold=0.5):
+            time.sleep(1)
+            for pos in self.tower_btn_pos:
+                self.controller.click(*pos)
+                time.sleep(1)
+                if self.match_template(self.chuji, threshold=0.5):
+                    time.sleep(1)
+                    for _ in range(3):
+                        if self.match_template(self.chuji, threshold=0.5):
+                            time.sleep(20)  # 等待，确保战斗开始
+                            self.match_template(self.winner, times = 5, delay = 20, threshold=0.5)
+                            time.sleep(1)  # 等待 1 秒，确保界面稳定
+                            for _ in range(4):
+                                time.sleep(1)
+                                self.controller.click(*self.controller.get_point(0.9, 0.9))
+                            time.sleep(5)  # 等待 1 秒，确保界面稳定
+                        else:
+                            continue
+                    self.match_template(self.return_btn, threshold=0.5)
+        time.sleep(1)
+        self.match_template(self.home, threshold=0.5)
+        return True
+
 class DailyRewardTask(Task):
     def __init__(self, name, controller):
         super().__init__(name, controller)

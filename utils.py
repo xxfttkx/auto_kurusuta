@@ -141,7 +141,7 @@ def screenshot_window(win):
 def save_failed_screenshot(screenshot):
     try:
         # 转换为 RGB 才能正确交给 PIL
-        screenshot_rgb = cv2.cvtColor(screenshot, cv2.COLOR_BGR2RGB)
+        screenshot_rgb = screenshot
         img = Image.fromarray(screenshot_rgb)
         save_screenshot(img)  # 你自己的保存函数
     except Exception as e:

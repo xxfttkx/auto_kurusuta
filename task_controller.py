@@ -32,7 +32,7 @@ class TaskController:
                 self.current_task_index += 1
 
     def click(self, x, y):
-        """1080*720 的逻辑坐标，自动缩放到窗口实际分辨率""" 
+        """1280*720 的逻辑坐标，自动缩放到窗口实际分辨率""" 
         w, h = get_client_size(self.target_window)
         real_x = int(x * w / self.width)
         real_y = int(y * h / self.height)
