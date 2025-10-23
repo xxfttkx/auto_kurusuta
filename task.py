@@ -263,10 +263,10 @@ class AutoBattleTask(Task):
             log("[自动战斗] 未检测到灰色锁，结束自动战斗任务")
             return False
         self.match_template_and_click(self.battle, threshold=0.5)
-        if self.match_template_but_not_click(self.ready, times = 20, delay = 0.5, threshold=0.5):
-            time.sleep(1.5)
+        if self.match_template_but_not_click(self.ready, times = 40, delay = 0.2, threshold=0.5):
+            time.sleep(0.8)
             self.controller.click(*self.controller.get_point(0.5, 0.5))
-        self.match_template_and_click(self.winner, times = 24, delay = 5, threshold=0.5)
+        self.match_template_and_click(self.winner, times = 25, delay = 5, threshold=0.5)
         time.sleep(1)  # 等待 1 秒，确保界面稳定
         for _ in range(4):
             time.sleep(1)
