@@ -29,7 +29,12 @@ TASKS = {
 def main():
     parser = argparse.ArgumentParser(description="任务执行器")
     parser.add_argument("tasks", nargs="*", help="要执行的任务（留空则执行全部）")
-    parser.add_argument("--list", action="store_true", help="列出所有可用任务")
+    parser.add_argument(
+        "-l", "--list",
+        action="store_true",
+        help="列出所有可用任务"
+    )
+
 
     args = parser.parse_args()
 

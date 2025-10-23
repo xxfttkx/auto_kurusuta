@@ -224,7 +224,7 @@ class TowerTask(Task):
                             time.sleep(5)  # 等待 1 秒，确保界面稳定
                         else:
                             continue
-                    self.match_template(self.return_btn, threshold=0.5)
+                    # self.match_template(self.return_btn, threshold=0.5)
         time.sleep(1)
         self.match_template(self.home, threshold=0.5)
         return True
