@@ -30,9 +30,9 @@ class Task:
             _, max_val, _, max_loc = cv2.minMaxLoc(res)
             x, y = max_loc
             h, w = image.shape[:2]
-            recogonize_flag = max_val > threshold
-            log(f"[{self.name} {image_path}] {recogonize_flag and '识别成功' or '识别失败'} {count}. 匹配度: {max_val:.2f}, 位置: {max_loc}，匹配位置: ({x}, {y}), 尺寸: ({w}, {h})")
-            if recogonize_flag:  # 匹配度阈值
+            recogonize_success = max_val > threshold
+            log(f"[{self.name} {image_path}] {recogonize_success and '识别成功' or '识别失败'} {count}. 匹配度: {max_val:.2f}, 位置: {max_loc}，匹配位置: ({x}, {y}), 尺寸: ({w}, {h})")
+            if recogonize_success:  # 匹配度阈值
                 # 画出匹配到的矩形框，便于调试
                 if self.controller.is_testing:
                     cv2.rectangle(screenshot, (x, y), (x + w, y + h), (0, 255, 0), 2)
@@ -46,8 +46,9 @@ class Task:
             time.sleep(delay)
         return False
     
-    def match_template(self, image, times = 5, delay = 1, threshold=0.5):
+    def match_template_and_click(self, image, times = 5, delay = 1, threshold=0.5):
         count = 0
+        image_path, image = image.path, image.image
         while count<times:
             self.controller.activate_target_window()
             screenshot = screenshot_window(self.controller.target_window)
@@ -56,18 +57,19 @@ class Task:
             _, max_val, _, max_loc = cv2.minMaxLoc(res)
             x, y = max_loc
             h, w = image.shape[:2]
-            log(f"[{self.name}] {count}. 匹配度: {max_val:.2f}, 位置: {max_loc}，匹配位置: ({x}, {y}), 尺寸: ({w}, {h})")
-            if max_val > threshold:  # 匹配度阈值
+            recogonize_success = max_val > threshold
+            log(f"[{self.name} {image_path}] {recogonize_success and '识别成功' or '识别失败'} {count}. 匹配度: {max_val:.2f}, 位置: {max_loc}，匹配位置: ({x}, {y}), 尺寸: ({w}, {h})")
+            if recogonize_success:  # 匹配度阈值
                 # 画出匹配到的矩形框，便于调试
-                cv2.rectangle(screenshot, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                cv2.imwrite("debug_match.png", cv2.cvtColor(screenshot, cv2.COLOR_RGB2BGR))  # 或保存到文件
-                log(f"[{self.name}] 识别成功")
+                if self.controller.is_testing:
+                    cv2.rectangle(screenshot, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                    cv2.imwrite("debug_match.png", cv2.cvtColor(screenshot, cv2.COLOR_RGB2BGR))  # 或保存到文件
                 self.controller.click(x+int(w/2), y+int(h/2))
                 return True
             else:
-                cv2.rectangle(screenshot, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                cv2.imwrite("debug_match_failed.png", cv2.cvtColor(screenshot, cv2.COLOR_RGB2BGR))  # 或保存到文件
-                log(f"[{self.name}] 识别失败")
+                if self.controller.is_testing:
+                    cv2.rectangle(screenshot, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                    cv2.imwrite("debug_match_failed.png", cv2.cvtColor(screenshot, cv2.COLOR_RGB2BGR))  # 或保存到文件
             count+=1
             time.sleep(delay)
         return False
@@ -83,9 +85,9 @@ class EnterGameTask(Task):
     def check_and_run(self):
         if not self.enabled:
             return
-        self.match_template(self.start_btn)
+        self.match_template_and_click(self.start_btn)
         time.sleep(1)
-        self.match_template(self.hai_btn)
+        self.match_template_and_click(self.hai_btn)
         return True
 
 
@@ -99,7 +101,7 @@ class SkipTask(Task):
         if not self.enabled:
             return
         for i in range(10):  # 循环 10 次
-            self.match_template(self.skip_btn, threshold=0.5)
+            self.match_template_and_click(self.skip_btn, threshold=0.5)
             time.sleep(1)  # 每次间隔 1 秒
         return True
 
@@ -113,7 +115,7 @@ class CloseTask(Task):
         if not self.enabled:
             return
         for i in range(5):  # 循环 10 次
-            self.match_template(self.btn, threshold=0.5)
+            self.match_template_and_click(self.btn, threshold=0.5)
             time.sleep(1)  # 每次间隔 1 秒
         return True
 
@@ -126,9 +128,9 @@ class RewardTask(Task):
     def check_and_run(self):
         if not self.enabled:
             return
-        self.match_template(self.btn, threshold=0.5)
+        self.match_template_and_click(self.btn, threshold=0.5)
         time.sleep(5)  # 等待 1 秒，确保界面稳定
-        self.match_template(self.close_btn, threshold=0.5)
+        self.match_template_and_click(self.close_btn, threshold=0.5)
         return True
 
 class DailyTask(Task):
@@ -147,29 +149,29 @@ class DailyTask(Task):
     def check_and_run(self):
         if not self.enabled:
             return
-        self.match_template(self.quest_btn, threshold=0.5)
-        self.match_template(self.daily_1_btn, threshold=0.5)
-        self.match_template(self.skip_daily_1, threshold=0.5)
-        self.match_template(self.ok, threshold=0.5)
+        self.match_template_and_click(self.quest_btn, threshold=0.5)
+        self.match_template_and_click(self.daily_1_btn, threshold=0.5)
+        self.match_template_and_click(self.skip_daily_1, threshold=0.5)
+        self.match_template_and_click(self.ok, threshold=0.5)
         time.sleep(1)  # 等待 1 秒，确保界面稳定
-        self.match_template(self.hai, threshold=0.5)
+        self.match_template_and_click(self.hai, threshold=0.5)
         for _ in range(7):
             time.sleep(1)
             self.controller.click(640, 620)
-        self.match_template(self.return_btn, threshold=0.5)
-        self.match_template(self.daily_2_btn, threshold=0.5)
-        self.match_template(self.skip_daily_2, threshold=0.5)
+        self.match_template_and_click(self.return_btn, threshold=0.5)
+        self.match_template_and_click(self.daily_2_btn, threshold=0.5)
+        self.match_template_and_click(self.skip_daily_2, threshold=0.5)
         time.sleep(1)
         self.controller.click(700, 420)
         time.sleep(1)
-        self.match_template(self.ok, threshold=0.5)
+        self.match_template_and_click(self.ok, threshold=0.5)
         time.sleep(1)  # 等待 1 秒，确保界面稳定
-        self.match_template(self.hai, threshold=0.5)
+        self.match_template_and_click(self.hai, threshold=0.5)
         for _ in range(7):
             time.sleep(1)
             self.controller.click(640, 620)
         time.sleep(1)
-        self.match_template(self.home, threshold=0.5)
+        self.match_template_and_click(self.home, threshold=0.5)
         return True
 
 class TowerTask(Task):
@@ -187,9 +189,9 @@ class TowerTask(Task):
     def check_and_run(self):
         if not self.enabled:
             return
-        self.match_template(self.quest_btn, threshold=0.5)
+        self.match_template_and_click(self.quest_btn, threshold=0.5)
         time.sleep(1)
-        if self.match_template(self.tower, threshold=0.5):
+        if self.match_template_and_click(self.tower, threshold=0.5):
             time.sleep(1)
             for pos in self.tower_btn_pos:
                 self.controller.click(*pos)
@@ -197,11 +199,11 @@ class TowerTask(Task):
                 for _ in range(5):
                     if self.match_template_but_not_click(self.tower_word, threshold=0.5):
                         break
-                    if self.match_template(self.chuji, threshold=0.5):
+                    if self.match_template_and_click(self.chuji, threshold=0.5):
                         time.sleep(1)
-                        if self.match_template(self.chuji, threshold=0.5):
+                        if self.match_template_and_click(self.chuji, threshold=0.5):
                             time.sleep(20)  # 等待，确保战斗开始
-                            self.match_template(self.winner, times = 5, delay = 20, threshold=0.5)
+                            self.match_template_and_click(self.winner, times = 5, delay = 20, threshold=0.5)
                             time.sleep(1)  # 等待 1 秒，确保界面稳定
                             for _ in range(4):
                                 time.sleep(1)
@@ -211,7 +213,7 @@ class TowerTask(Task):
                             continue
                     # self.match_template(self.return_btn, threshold=0.5)
         time.sleep(1)
-        self.match_template(self.home, threshold=0.5)
+        self.match_template_and_click(self.home, threshold=0.5)
         return True
 
 class DailyRewardTask(Task):
@@ -223,9 +225,9 @@ class DailyRewardTask(Task):
     def check_and_run(self):
         if not self.enabled:
             return
-        self.match_template(self.mission, threshold=0.5)
+        self.match_template_and_click(self.mission, threshold=0.5)
         time.sleep(1)  # 等待 1 秒，确保界面稳定
-        self.match_template(self.receive, threshold=0.5)
+        self.match_template_and_click(self.receive, threshold=0.5)
         return True
 
 class ReceivePresentTask(Task):
@@ -236,13 +238,13 @@ class ReceivePresentTask(Task):
         self.close = Image("assets/close_btn.png")
 
     def check_and_run(self):
-        self.match_template(self.present, threshold=0.5)
+        self.match_template_and_click(self.present, threshold=0.5)
         time.sleep(1)
-        self.match_template(self.receive, threshold=0.5)
+        self.match_template_and_click(self.receive, threshold=0.5)
         time.sleep(2)
-        self.match_template(self.close, threshold=0.5)
+        self.match_template_and_click(self.close, threshold=0.5)
         time.sleep(1)
-        self.match_template(self.close, threshold=0.5)
+        self.match_template_and_click(self.close, threshold=0.5)
         return True
 
 class AutoBattleTask(Task):
@@ -250,7 +252,7 @@ class AutoBattleTask(Task):
         super().__init__(name, controller)
         self.battle = Image("assets/chuji.png")
         self.winner = Image("assets/winner.png")
-        self.skip = Image("assets/skip_button.png")
+        self.lock_gray = Image("assets/lock_gray.png")
 
     def check_and_run(self):
         if not self.enabled:
@@ -262,11 +264,11 @@ class AutoBattleTask(Task):
             time.sleep(0.2)
             self.controller.click(x1,y1)
             time.sleep(3)
-            if self.match_template(self.skip, times = 5, delay = 1, threshold=0.5):
+            if self.match_template_but_not_click(self.lock_gray, times = 5, delay = 1, threshold=0.5):
                 break
-            self.match_template(self.battle, threshold=0.5)
+            self.match_template_and_click(self.battle, threshold=0.5)
             time.sleep(20)  # 等待 10 秒，确保战斗开始
-            self.match_template(self.winner, times = 5, delay = 20, threshold=0.5)
+            self.match_template_and_click(self.winner, times = 5, delay = 20, threshold=0.5)
             time.sleep(1)  # 等待 1 秒，确保界面稳定
             for _ in range(4):
                 time.sleep(1)

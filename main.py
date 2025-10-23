@@ -20,9 +20,9 @@ TASKS = {
     "close": task.CloseTask,
     "reward": task.RewardTask,
     "daily": task.DailyTask,
-    "dailyreward": task.DailyRewardTask,
+    "daily_reward": task.DailyRewardTask,
     "receive_present": task.ReceivePresentTask,
-    "autobattle": task.AutoBattleTask,
+    "auto_battle": task.AutoBattleTask,
     "tower": task.TowerTask,
 }
 
