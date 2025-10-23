@@ -4,7 +4,11 @@ from utils import log, click_window, screenshot_window, get_rgb_image
 import cv2
 import numpy as np
 
- 
+
+class Image:
+    def __init__(self, path):
+        self.path = path
+        self.image = get_rgb_image(self.path)
 class Task:
     def __init__(self, name, controller):
         self.name = name
@@ -188,8 +192,7 @@ class TowerTask(Task):
         super().__init__(name, controller)
         self.quest_btn = get_rgb_image("assets/quest_btn.png")
         self.tower = get_rgb_image("assets/tower.png")
-        self.ok = get_rgb_image("assets/ok.png")
-        self.hai = get_rgb_image("assets/hai.png")
+        self.tower_word = get_rgb_image("assets/tower_word.png")
         self.return_btn = get_rgb_image("assets/return.png")
         self.chuji = get_rgb_image("assets/chuji.png")
         self.winner = get_rgb_image("assets/winner.png")
@@ -206,9 +209,11 @@ class TowerTask(Task):
             for pos in self.tower_btn_pos:
                 self.controller.click(*pos)
                 time.sleep(1)
-                if self.match_template(self.chuji, threshold=0.5):
-                    time.sleep(1)
-                    for _ in range(3):
+                for _ in range(5):
+                    if self.match_template_but_not_click(self.tower_word, threshold=0.5):
+                        break
+                    if self.match_template(self.chuji, threshold=0.5):
+                        time.sleep(1)
                         if self.match_template(self.chuji, threshold=0.5):
                             time.sleep(20)  # 等待，确保战斗开始
                             self.match_template(self.winner, times = 5, delay = 20, threshold=0.5)

@@ -51,5 +51,5 @@ class TaskController:
 
     def exit_program(self):
         log("检测到 / 键，退出程序")
-        self.stop_all()
+        # self.stop_all()
         os._exit(0)
