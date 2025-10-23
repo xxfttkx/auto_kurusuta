@@ -31,7 +31,7 @@ class Task:
             x, y = max_loc
             h, w = image.shape[:2]
             recogonize_success = max_val > threshold
-            log(f"[{self.name} {image_path}] {recogonize_success and '识别成功' or '识别失败'} {count}. 匹配度: {max_val:.2f}, 位置: {max_loc}，匹配位置: ({x}, {y}), 尺寸: ({w}, {h})")
+            log(f"[{self.name} {image_path}] {recogonize_success and '识别成功' or '识别失败'} {count}/{times}. 匹配度: {max_val:.2f}, 位置: {max_loc}，匹配位置: ({x}, {y}), 尺寸: ({w}, {h})")
             if recogonize_success:  # 匹配度阈值
                 # 画出匹配到的矩形框，便于调试
                 if self.controller.is_testing:
@@ -58,7 +58,7 @@ class Task:
             x, y = max_loc
             h, w = image.shape[:2]
             recogonize_success = max_val > threshold
-            log(f"[{self.name} {image_path}] {recogonize_success and '识别成功' or '识别失败'} {count}. 匹配度: {max_val:.2f}, 位置: {max_loc}，匹配位置: ({x}, {y}), 尺寸: ({w}, {h})")
+            log(f"[{self.name} {image_path}] {recogonize_success and '识别成功' or '识别失败'} {count}/{times}. 匹配度: {max_val:.2f}, 位置: {max_loc}，匹配位置: ({x}, {y}), 尺寸: ({w}, {h})")
             if recogonize_success:  # 匹配度阈值
                 # 画出匹配到的矩形框，便于调试
                 if self.controller.is_testing:
@@ -252,7 +252,27 @@ class AutoBattleTask(Task):
         super().__init__(name, controller)
         self.battle = Image("assets/chuji.png")
         self.winner = Image("assets/winner.png")
+        self.lock_golden = Image("assets/lock_golden.png")
         self.lock_gray = Image("assets/lock_gray.png")
+        self.ready = Image("assets/ready.png")
+
+    def battle_point(self, point):
+        self.controller.click(*point)
+        time.sleep(3)
+        if not self.match_template_but_not_click(self.lock_gray, times = 5, delay = 1, threshold=0.5):
+            log("[自动战斗] 未检测到灰色锁，结束自动战斗任务")
+            return False
+        self.match_template_and_click(self.battle, threshold=0.5)
+        if self.match_template_but_not_click(self.ready, times = 20, delay = 0.5, threshold=0.5):
+            time.sleep(1.5)
+            self.controller.click(*self.controller.get_point(0.5, 0.5))
+        self.match_template_and_click(self.winner, times = 24, delay = 5, threshold=0.5)
+        time.sleep(1)  # 等待 1 秒，确保界面稳定
+        for _ in range(4):
+            time.sleep(1)
+            self.controller.click(*self.controller.get_point(0.9, 0.9))
+        time.sleep(5)  # 等待 1 秒，确保界面稳定
+        return True
 
     def check_and_run(self):
         if not self.enabled:
@@ -261,19 +281,13 @@ class AutoBattleTask(Task):
         x2,y2 = self.controller.get_point(0.7, 0.8)
         while True:
             self.controller.drag(x1, y1, x2, y2, duration=0.2)
-            time.sleep(0.2)
-            self.controller.click(x1,y1)
-            time.sleep(3)
-            if self.match_template_but_not_click(self.lock_gray, times = 5, delay = 1, threshold=0.5):
+            if not self.match_template_but_not_click(self.lock_golden, times = 5, delay = 1, threshold=0.5):
+                log("[自动战斗] 未检测到金色锁，将战斗最上面的关卡，结束自动战斗任务")
+                self.battle_point(self.controller.get_point(0.7, 0.3))
                 break
-            self.match_template_and_click(self.battle, threshold=0.5)
-            time.sleep(20)  # 等待 10 秒，确保战斗开始
-            self.match_template_and_click(self.winner, times = 5, delay = 20, threshold=0.5)
-            time.sleep(1)  # 等待 1 秒，确保界面稳定
-            for _ in range(4):
-                time.sleep(1)
-                self.controller.click(*self.controller.get_point(0.9, 0.9))
-            time.sleep(5)  # 等待 1 秒，确保界面稳定
+            time.sleep(0.2)
+            if not self.battle_point((x1,y1)):
+                break
         return True
     
 class BackToHomeTask:
