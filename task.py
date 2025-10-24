@@ -190,20 +190,20 @@ class TowerTask(Task):
         if not self.enabled:
             return
         self.match_template_and_click(self.quest_btn, threshold=0.5)
-        time.sleep(1)
+        time.sleep(3)
         if self.match_template_and_click(self.tower, threshold=0.5):
-            time.sleep(1)
+            time.sleep(2)
             for pos in self.tower_btn_pos:
                 self.controller.click(*pos)
                 time.sleep(1)
                 for _ in range(5):
-                    if self.match_template_but_not_click(self.tower_word, threshold=0.5):
+                    if self.match_template_but_not_click(self.tower_word, times=3, threshold=0.7):
                         break
                     if self.match_template_and_click(self.chuji, threshold=0.5):
                         time.sleep(1)
                         if self.match_template_and_click(self.chuji, threshold=0.5):
                             time.sleep(20)  # 等待，确保战斗开始
-                            self.match_template_and_click(self.winner, times = 5, delay = 20, threshold=0.5)
+                            self.match_template_and_click(self.winner, times = 30, delay = 5, threshold=0.5)
                             time.sleep(1)  # 等待 1 秒，确保界面稳定
                             for _ in range(4):
                                 time.sleep(1)
