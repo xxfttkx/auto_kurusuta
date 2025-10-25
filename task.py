@@ -46,7 +46,7 @@ class Task:
             time.sleep(delay)
         return False
     
-    def match_template_and_click(self, image, times = 5, delay = 1, threshold=0.5):
+    def match_template_and_click(self, image, times = 5, delay = 1, threshold=0.5, click_delay: float = 0.0):
         count = 0
         image_path, image = image.path, image.image
         while count<times:
@@ -65,6 +65,8 @@ class Task:
                     cv2.rectangle(screenshot, (x, y), (x + w, y + h), (0, 255, 0), 2)
                     cv2.imwrite("debug_match.png", cv2.cvtColor(screenshot, cv2.COLOR_RGB2BGR))  # 或保存到文件
                 self.controller.click(x+int(w/2), y+int(h/2))
+                if click_delay > 0:
+                    time.sleep(click_delay)
                 return True
             else:
                 if self.controller.is_testing:
@@ -163,8 +165,8 @@ class DailyTask(Task):
         self.match_template_and_click(self.skip_daily_2, threshold=0.5)
         time.sleep(1)
         self.controller.click(700, 420)
-        time.sleep(2)
-        self.match_template_and_click(self.ok, threshold=0.5)
+        time.sleep(1)
+        self.match_template_and_click(self.ok, threshold=0.5, click_delay=0.5)
         time.sleep(1)  # 等待 1 秒，确保界面稳定
         self.match_template_and_click(self.hai, threshold=0.5)
         for _ in range(7):
