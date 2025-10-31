@@ -154,9 +154,9 @@ class DailyTask(Task):
         self.match_template_and_click(self.quest_btn, threshold=0.5)
         self.match_template_and_click(self.daily_1_btn, threshold=0.5)
         self.match_template_and_click(self.skip_daily_1, threshold=0.5)
-        self.match_template_and_click(self.ok, threshold=0.5, click_delay=0.5)
         time.sleep(1)  # 等待 1 秒，确保界面稳定
-        self.match_template_and_click(self.hai, threshold=0.5, click_delay=0.5)
+        self.match_template_and_click(self.ok, threshold=0.6, click_delay=0.5)
+        self.match_template_and_click(self.hai, threshold=0.6, click_delay=0.5)
         for _ in range(7):
             time.sleep(1)
             self.controller.click(640, 620)
@@ -187,6 +187,8 @@ class TowerTask(Task):
         self.winner = Image("assets/winner.png")
         self.home = Image("assets/home.png")
         self.tower_btn_pos = [(259,280),(479,280),(699,280),(919,280),(1139,280)]
+        self.auto_btn = [(969,44),(1062,78)]
+        self.auto_color = (228, 244, 247)
 
     def check_and_run(self):
         if not self.enabled:
@@ -205,6 +207,8 @@ class TowerTask(Task):
                         time.sleep(1)
                         if self.match_template_and_click(self.chuji, threshold=0.5):
                             time.sleep(20)  # 等待，确保战斗开始
+                            if self.controller.is_area_color(self.auto_btn[0], self.auto_btn[1], self.auto_color, tolerance=30, threshold_ratio=0.5):
+                                self.controller.click((self.auto_btn[0][0]+self.auto_btn[1][0])//2, (self.auto_btn[0][1]+self.auto_btn[1][1])//2)
                             self.match_template_and_click(self.winner, times = 30, delay = 5, threshold=0.5)
                             time.sleep(1)  # 等待 1 秒，确保界面稳定
                             for _ in range(4):

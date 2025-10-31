@@ -290,3 +290,34 @@ def get_rgb_image(image_path):
     if image is None:
         raise ValueError(f"无法读取图像文件: {image_path}")
     return cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # OpenCV 默认是 BGR，需要转换为 RGB
+
+def check_area_color(window, p1, p2, expected_color, tolerance, threshold_ratio = 0.5):
+    """
+    检测指定窗口客户区内 (p1, p2) 区域的颜色是否符合预期
+    window: 目标窗口对象，必须有 _hWnd
+    p1, p2: 客户区内的两个对角点坐标 (x1, y1), (x2, y2)
+    expected_color: 预期的 RGB 颜色元组 (R, G, B)
+    tolerance: 颜色容差（每个通道的允许偏差范围）
+    返回: True 如果区域内所有像素颜色都在预期范围内，否则 False
+    """
+    x1, y1 = point_add_win(p1, window)
+    x2, y2 = point_add_win(p2, window)
+    width = x2 - x1
+    height = y2 - y1
+
+    screenshot = capture_roi(x1, y1, width, height)
+    if screenshot is None:
+        return False
+
+    # 检查每个像素的颜色是否在预期范围内
+    lower_bound = np.array([max(0, c - tolerance) for c in expected_color], dtype=np.uint8)
+    upper_bound = np.array([min(255, c + tolerance) for c in expected_color], dtype=np.uint8)
+
+    # 统计在颜色范围内的像素数
+    mask = cv2.inRange(screenshot, lower_bound, upper_bound)
+    matched_pixels = cv2.countNonZero(mask)
+
+    total_pixels = width * height
+    ratio = matched_pixels / total_pixels
+
+    return ratio >= threshold_ratio

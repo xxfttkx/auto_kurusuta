@@ -48,6 +48,13 @@ class TaskController:
             self.target_window.activate()
         except Exception as e:
             log(f"激活窗口失败: {e}")
+        
+    def is_area_color(self, p1, p2, expected_color, tolerance=10, threshold_ratio=0.5):
+        """检测指定区域颜色是否符合预期"""
+        w, h = get_client_size(self.target_window)
+        scaled_p1 = (int(p1[0] * w / self.width), int(p1[1] * h / self.height))
+        scaled_p2 = (int(p2[0] * w / self.width), int(p2[1] * h / self.height))
+        return check_area_color(self.target_window, scaled_p1, scaled_p2, expected_color, tolerance, threshold_ratio)
 
     def exit_program(self):
         log("检测到 / 键，退出程序")
