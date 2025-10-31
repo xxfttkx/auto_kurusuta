@@ -61,11 +61,15 @@ def start_gui():
             selected_listbox.delete(idx)
             selected_listbox.insert(idx + 1, task)
             selected_listbox.select_set(idx + 1)
+    
+    def clear_task():
+        selected_listbox.delete(0, tk.END)
 
     tk.Button(btn_frame, text="→ 添加", command=add_task).grid(row=0, column=0, padx=5, pady=2)
     tk.Button(btn_frame, text="← 移除", command=remove_task).grid(row=1, column=0, padx=5, pady=2)
     tk.Button(btn_frame, text="↑ 上移", command=move_up).grid(row=2, column=0, padx=5, pady=2)
     tk.Button(btn_frame, text="↓ 下移", command=move_down).grid(row=3, column=0, padx=5, pady=2)
+    tk.Button(btn_frame, text="clear", command=clear_task).grid(row=4, column=0, padx=5, pady=2)
 
     # ========== 右边：日志输出 ==========
     right_frame = tk.Frame(root, bg="#ffffff")
