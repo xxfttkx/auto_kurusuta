@@ -155,7 +155,7 @@ class DailyTask(Task):
         self.match_template_and_click(self.daily_1_btn, threshold=0.5)
         self.match_template_and_click(self.skip_daily_1, threshold=0.5)
         time.sleep(1)  # 等待 1 秒，确保界面稳定
-        self.match_template_and_click(self.ok, threshold=0.6, click_delay=0.5)
+        self.match_template_and_click(self.ok, threshold=0.6, click_delay=0.8)
         self.match_template_and_click(self.hai, threshold=0.6, click_delay=0.5)
         for _ in range(7):
             time.sleep(1)
@@ -165,7 +165,7 @@ class DailyTask(Task):
         self.match_template_and_click(self.skip_daily_2, threshold=0.5)
         time.sleep(1)
         self.controller.click(700, 420)
-        time.sleep(1)
+        time.sleep(0.2)
         self.match_template_and_click(self.ok, threshold=0.5, click_delay=0.5)
         time.sleep(1)  # 等待 1 秒，确保界面稳定
         self.match_template_and_click(self.hai, threshold=0.5)
