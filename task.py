@@ -103,8 +103,10 @@ class SkipTask(Task):
         if not self.enabled:
             return
         for i in range(10):  # 循环 10 次
-            self.match_template_and_click(self.skip_btn, threshold=0.5)
-            time.sleep(1)  # 每次间隔 1 秒
+            if self.match_template_and_click(self.skip_btn, threshold=0.5):
+                time.sleep(1)  # 每次间隔 1 秒
+            else:
+                break
         return True
 
 class CloseTask(Task):
@@ -117,8 +119,10 @@ class CloseTask(Task):
         if not self.enabled:
             return
         for i in range(5):  # 循环 10 次
-            self.match_template_and_click(self.btn, threshold=0.5)
-            time.sleep(1)  # 每次间隔 1 秒
+            if self.match_template_and_click(self.btn, threshold=0.5):
+                time.sleep(1)  # 每次间隔 1 秒
+            else:
+                break
         return True
 
 class RewardTask(Task):
