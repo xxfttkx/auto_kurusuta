@@ -118,7 +118,7 @@ class CloseTask(Task):
     def check_and_run(self):
         if not self.enabled:
             return
-        for i in range(5):  # 循环 10 次
+        for i in range(10):  # 循环 10 次
             if self.match_template_and_click(self.btn, threshold=0.5):
                 time.sleep(1)  # 每次间隔 1 秒
             else:
@@ -156,23 +156,23 @@ class DailyTask(Task):
         if not self.enabled:
             return
         self.match_template_and_click(self.quest_btn, threshold=0.5)
-        self.match_template_and_click(self.daily_1_btn, threshold=0.5)
-        self.match_template_and_click(self.skip_daily_1, threshold=0.5)
+        self.match_template_and_click(self.daily_1_btn, threshold=0.5, click_delay=0.8)
+        self.match_template_and_click(self.skip_daily_1, threshold=0.5, click_delay=0.8)
         time.sleep(1)  # 等待 1 秒，确保界面稳定
         self.match_template_and_click(self.ok, threshold=0.6, click_delay=0.8)
         self.match_template_and_click(self.hai, threshold=0.6, click_delay=0.5)
         for _ in range(7):
             time.sleep(1)
             self.controller.click(640, 620)
-        self.match_template_and_click(self.return_btn, threshold=0.5)
-        self.match_template_and_click(self.daily_2_btn, threshold=0.5)
-        self.match_template_and_click(self.skip_daily_2, threshold=0.5)
+        self.match_template_and_click(self.return_btn, threshold=0.5, click_delay=0.8)
+        self.match_template_and_click(self.daily_2_btn, threshold=0.5, click_delay=0.8)
+        self.match_template_and_click(self.skip_daily_2, threshold=0.5, click_delay=0.8)
         time.sleep(1)
         self.controller.click(700, 420)
         time.sleep(0.2)
         self.match_template_and_click(self.ok, threshold=0.5, click_delay=0.5)
         time.sleep(1)  # 等待 1 秒，确保界面稳定
-        self.match_template_and_click(self.hai, threshold=0.5)
+        self.match_template_and_click(self.hai, threshold=0.5, click_delay=0.8)
         for _ in range(7):
             time.sleep(1)
             self.controller.click(640, 620)
@@ -197,7 +197,7 @@ class TowerTask(Task):
     def check_and_run(self):
         if not self.enabled:
             return
-        self.match_template_and_click(self.quest_btn, threshold=0.5)
+        self.match_template_and_click(self.quest_btn, threshold=0.5, times=10)
         time.sleep(3)
         if self.match_template_and_click(self.tower, threshold=0.5):
             time.sleep(2)
