@@ -193,12 +193,13 @@ class TowerTask(Task):
         self.tower_btn_pos = [(259,280),(479,280),(699,280),(919,280),(1139,280)]
         self.auto_btn = [(969,44),(1062,78)]
         self.auto_color = (228, 244, 247)
+        self.close = Image("assets/close.png")
+        self.ready = Image("assets/ready.png")
 
     def check_and_run(self):
         if not self.enabled:
             return
         self.match_template_and_click(self.quest_btn, threshold=0.5, times=10)
-        time.sleep(3)
         if self.match_template_and_click(self.tower, threshold=0.5):
             time.sleep(2)
             for pos in self.tower_btn_pos:
@@ -207,10 +208,14 @@ class TowerTask(Task):
                 for _ in range(5):
                     if self.match_template_but_not_click(self.tower_word, times=3, threshold=0.7):
                         break
+                    if self.match_template_and_click(self.close, times=3, threshold=0.5, click_delay=0.3):
+                        log("[塔] 关闭多余弹窗")
                     if self.match_template_and_click(self.chuji, threshold=0.5):
                         time.sleep(1)
                         if self.match_template_and_click(self.chuji, threshold=0.5):
-                            time.sleep(20)  # 等待，确保战斗开始
+                            if self.match_template_but_not_click(self.ready, times = 40, delay = 0.2, threshold=0.5):
+                                time.sleep(0.8)
+                                self.controller.click(*self.controller.get_point(0.5, 0.5))
                             if self.controller.is_area_color(self.auto_btn[0], self.auto_btn[1], self.auto_color, tolerance=30, threshold_ratio=0.5):
                                 self.controller.click((self.auto_btn[0][0]+self.auto_btn[1][0])//2, (self.auto_btn[0][1]+self.auto_btn[1][1])//2)
                             self.match_template_and_click(self.winner, times = 30, delay = 5, threshold=0.5)
@@ -265,6 +270,7 @@ class AutoBattleTask(Task):
         self.lock_golden = Image("assets/lock_golden.png")
         self.lock_gray = Image("assets/lock_gray.png")
         self.ready = Image("assets/ready.png")
+        self.close_btn = Image("assets/close_btn.png")
 
     def battle_point(self, point):
         self.controller.click(*point)
@@ -278,7 +284,7 @@ class AutoBattleTask(Task):
             self.controller.click(*self.controller.get_point(0.5, 0.5))
         self.match_template_and_click(self.winner, times = 25, delay = 5, threshold=0.5)
         time.sleep(1)  # 等待 1 秒，确保界面稳定
-        for _ in range(4):
+        for _ in range(6):
             time.sleep(1)
             self.controller.click(*self.controller.get_point(0.9, 0.9))
         time.sleep(5)  # 等待 1 秒，确保界面稳定
@@ -290,6 +296,7 @@ class AutoBattleTask(Task):
         x1,y1 = self.controller.get_point(0.7, 0.38)
         x2,y2 = self.controller.get_point(0.7, 0.8)
         while True:
+            self.match_template_and_click(self.close_btn, times = 3, threshold=0.5)
             self.controller.drag(x1, y1, x2, y2, duration=0.2)
             if not self.match_template_but_not_click(self.lock_golden, times = 5, delay = 1, threshold=0.5):
                 log("[自动战斗] 未检测到金色锁，将战斗最上面的关卡，结束自动战斗任务")
