@@ -27,7 +27,7 @@ def start_gui():
 
     selected_listbox = tk.Listbox(left_frame, selectmode=tk.SINGLE, width=30, height=15)
     selected_listbox.pack(pady=10)
-    DEFAULT_TASKS = ["enter", "skip", "close","reward", "daily"]
+    DEFAULT_TASKS = ["enter", "skip", "close","reward", "daily", "tower"]
     # 初始化默认任务
     for t in DEFAULT_TASKS:
         if t in TASKS:

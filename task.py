@@ -23,6 +23,10 @@ class Task:
         count = 0
         image_path, image = image.path, image.image
         while count<times:
+            if not self.controller.is_window_active():
+                log(f"[{self.name}] 目标窗口未激活，跳过匹配")
+                time.sleep(delay)
+                continue
             self.controller.activate_target_window()
             screenshot = screenshot_window(self.controller.target_window)
             screenshot = cv2.resize(screenshot, self.controller.get_default_size())
@@ -50,6 +54,10 @@ class Task:
         count = 0
         image_path, image = image.path, image.image
         while count<times:
+            if not self.controller.is_window_active():
+                log(f"[{self.name}] 目标窗口未激活，跳过匹配")
+                time.sleep(delay)
+                continue
             self.controller.activate_target_window()
             screenshot = screenshot_window(self.controller.target_window)
             screenshot = cv2.resize(screenshot, self.controller.get_default_size())
