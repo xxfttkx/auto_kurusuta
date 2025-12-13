@@ -110,12 +110,14 @@ class SkipTask(Task):
     def check_and_run(self):
         if not self.enabled:
             return
-        for i in range(10):  # 循环 10 次
-            if self.match_template_and_click(self.skip_btn, threshold=0.5):
-                time.sleep(1)  # 每次间隔 1 秒
-            else:
-                break
-        return True
+        if self.match_template_but_not_click(self.skip_btn, times=100, delay=1, threshold=0.5):
+            for i in range(10):  # 循环 10 次
+                if self.match_template_and_click(self.skip_btn, times = 5, threshold=0.5):
+                    time.sleep(1)  # 每次间隔 1 秒
+                else:
+                    break
+            return True
+        return False
 
 class CloseTask(Task):
     def __init__(self, name, controller):
@@ -126,12 +128,14 @@ class CloseTask(Task):
     def check_and_run(self):
         if not self.enabled:
             return
-        for i in range(10):  # 循环 10 次
-            if self.match_template_and_click(self.btn, threshold=0.5):
-                time.sleep(1)  # 每次间隔 1 秒
-            else:
-                break
-        return True
+        if self.match_template_but_not_click(self.btn, times=100, delay=1, threshold=0.5):
+            for i in range(10):  # 循环 10 次
+                if self.match_template_and_click(self.btn, times = 5, threshold=0.5):
+                    time.sleep(1)  # 每次间隔 1 秒
+                else:
+                    break
+            return True
+        return False
 
 class RewardTask(Task):
     def __init__(self, name, controller):
@@ -207,8 +211,8 @@ class TowerTask(Task):
     def check_and_run(self):
         if not self.enabled:
             return
-        self.match_template_and_click(self.quest_btn, threshold=0.5, times=10)
-        if self.match_template_and_click(self.tower, threshold=0.5):
+        self.match_template_and_click(self.quest_btn, click_delay = 0.5, threshold=0.5, times=10)
+        if self.match_template_and_click(self.tower, click_delay = 1, threshold=0.5):
             time.sleep(2)
             for pos in self.tower_btn_pos:
                 self.controller.click(*pos)

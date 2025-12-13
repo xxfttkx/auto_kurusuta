@@ -50,7 +50,7 @@ class TaskController:
             log(f"激活窗口失败: {e}")
     
     def is_window_active(self):
-        return self.target_window.active
+        return self.target_window.isActive
         
     def is_area_color(self, p1, p2, expected_color, tolerance=10, threshold_ratio=0.5):
         """检测指定区域颜色是否符合预期"""
