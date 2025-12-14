@@ -24,6 +24,7 @@ TASKS = {
     "receive_present": task.ReceivePresentTask,
     "auto_battle": task.AutoBattleTask,
     "tower": task.TowerTask,
+    "battle_task": task.BattleTask,
 }
 
 def main():

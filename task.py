@@ -243,6 +243,30 @@ class TowerTask(Task):
         self.match_template_and_click(self.home, threshold=0.5)
         return True
 
+class BattleTask(Task):
+    def __init__(self, name, controller):
+        super().__init__(name, controller)
+        self.winner = Image("assets/winner.png")
+        self.next_battle = Image("assets/next_battle.png")
+        self.ready = Image("assets/ready.png")
+
+    def check_and_run(self):
+        if not self.enabled:
+            return
+        while self.match_template_and_click(self.winner, times = 50, delay = 5, threshold=0.5,click_delay=2):
+            time.sleep(2)
+            self.controller.click(*self.controller.get_point(0.8, 0.8))
+            time.sleep(1)
+            self.controller.click(*self.controller.get_point(0.8, 0.8))
+            if not self.match_template_and_click(self.next_battle, times = 10, delay = 1, threshold=0.5,click_delay=1):
+                self.controller.click(*self.controller.get_point(0.8, 0.8))
+                if not self.match_template_and_click(self.next_battle, times = 10, delay = 1, threshold=0.5,click_delay=1):
+                    break
+            if self.match_template_but_not_click(self.ready, times = 40, delay = 0.2, threshold=0.5):
+                time.sleep(0.8)
+                self.controller.click(*self.controller.get_point(0.5, 0.5))
+        return True
+
 class DailyRewardTask(Task):
     def __init__(self, name, controller):
         super().__init__(name, controller)
