@@ -207,17 +207,19 @@ class TowerTask(Task):
         self.auto_color = (228, 244, 247)
         self.close = Image("assets/close.png")
         self.ready = Image("assets/ready.png")
+        self.stage_select = Image("assets/stage_select.png")
 
     def check_and_run(self):
         if not self.enabled:
             return
-        self.match_template_and_click(self.quest_btn, click_delay = 0.5, threshold=0.5, times=10)
-        if self.match_template_and_click(self.tower, click_delay = 1, threshold=0.5):
+        self.match_template_and_click(self.quest_btn, click_delay = 0.5, threshold=0.5, times=15)
+        if self.match_template_and_click(self.tower, click_delay = 1, threshold=0.5, times=15):
             time.sleep(2)
             for pos in self.tower_btn_pos:
                 self.controller.click(*pos)
                 time.sleep(1)
                 for _ in range(5):
+                    success = False
                     if self.match_template_but_not_click(self.tower_word, times=3, threshold=0.7):
                         break
                     if self.match_template_and_click(self.close, times=3, threshold=0.5, click_delay=0.3):
@@ -225,17 +227,26 @@ class TowerTask(Task):
                     if self.match_template_and_click(self.chuji, threshold=0.5):
                         time.sleep(1)
                         if self.match_template_and_click(self.chuji, threshold=0.5):
-                            if self.match_template_but_not_click(self.ready, times = 40, delay = 0.2, threshold=0.5):
-                                time.sleep(0.8)
-                                self.controller.click(*self.controller.get_point(0.5, 0.5))
-                            if self.controller.is_area_color(self.auto_btn[0], self.auto_btn[1], self.auto_color, tolerance=30, threshold_ratio=0.5):
-                                self.controller.click((self.auto_btn[0][0]+self.auto_btn[1][0])//2, (self.auto_btn[0][1]+self.auto_btn[1][1])//2)
-                            self.match_template_and_click(self.winner, times = 30, delay = 5, threshold=0.5)
-                            time.sleep(1)  # 等待 1 秒，确保界面稳定
-                            for _ in range(4):
-                                time.sleep(1)
-                                self.controller.click(*self.controller.get_point(0.9, 0.9))
-                            time.sleep(5)  # 等待 1 秒，确保界面稳定
+                            for _ in range(5):
+                                if self.match_template_but_not_click(self.ready, times = 40, delay = 0.2, threshold=0.5):
+                                    time.sleep(0.8)
+                                    self.controller.click(*self.controller.get_point(0.5, 0.5))
+                                if self.controller.is_area_color(self.auto_btn[0], self.auto_btn[1], self.auto_color, tolerance=30, threshold_ratio=0.5):
+                                    self.controller.click((self.auto_btn[0][0]+self.auto_btn[1][0])//2, (self.auto_btn[0][1]+self.auto_btn[1][1])//2)
+                                for i in range(30):
+                                    log(f"[塔] 等待战斗完成 {i+1}/30")
+                                    if self.match_template_and_click(self.winner, times = 1, delay = 5, threshold=0.5):
+                                        break
+                                    time.sleep(5)
+                                time.sleep(1)  # 等待 1 秒，确保界面稳定
+                                for _ in range(4):
+                                    time.sleep(1)
+                                    # 继续战斗
+                                    self.controller.click(*self.controller.get_point(0.9, 0.9))
+                                if self.match_template_and_click(self.stage_select, times = 1, delay = 1, threshold=0.5):
+                                    log("没有次数了")
+                                    time.sleep(5)
+                                    break
                         else:
                             continue
                     # self.match_template(self.return_btn, threshold=0.5)
@@ -262,7 +273,7 @@ class BattleTask(Task):
                 self.controller.click(*self.controller.get_point(0.8, 0.8))
                 if not self.match_template_and_click(self.next_battle, times = 10, delay = 1, threshold=0.5,click_delay=1):
                     break
-            if self.match_template_but_not_click(self.ready, times = 40, delay = 0.2, threshold=0.5):
+            if self.match_template_but_not_click(self.ready, times = 40, delay = 0.1, threshold=0.5):
                 time.sleep(0.8)
                 self.controller.click(*self.controller.get_point(0.5, 0.5))
         return True
@@ -297,6 +308,24 @@ class ReceivePresentTask(Task):
         time.sleep(1)
         self.match_template_and_click(self.close, threshold=0.5)
         return True
+class DailyFree50Task(Task):
+    def __init__(self, name, controller):
+        super().__init__(name, controller)
+        self.shop = Image("assets/shop.png")
+        self.school_store = Image("assets/school_store.png")
+        self.today_free = Image("assets/today_free.png")
+        self.free_50 = Image("assets/free_50.png")
+        self.close_btn = Image("assets/close_btn.png")
+        self.home = Image("assets/home.png")
+
+    def check_and_run(self):
+        self.match_template_and_click(self.shop, times = 10, threshold=0.5)
+        self.match_template_and_click(self.school_store, times = 10, threshold=0.5)
+        self.match_template_and_click(self.today_free, times = 10, threshold=0.5)
+        self.match_template_and_click(self.free_50, times = 10, threshold=0.5)
+        self.match_template_and_click(self.close_btn, times = 10, threshold=0.5)
+        self.match_template_and_click(self.home, times = 10, threshold=0.5)
+        return True
 
 class AutoBattleTask(Task):
     def __init__(self, name, controller):
@@ -311,11 +340,11 @@ class AutoBattleTask(Task):
     def battle_point(self, point):
         self.controller.click(*point)
         time.sleep(3)
-        if not self.match_template_but_not_click(self.lock_gray, times = 5, delay = 1, threshold=0.5):
+        if not self.match_template_but_not_click(self.lock_gray, times = 10, delay = 1, threshold=0.5):
             log("[自动战斗] 未检测到灰色锁，结束自动战斗任务")
             return False
         self.match_template_and_click(self.battle, threshold=0.5)
-        if self.match_template_but_not_click(self.ready, times = 40, delay = 0.2, threshold=0.5):
+        if self.match_template_but_not_click(self.ready, times = 60, delay = 0.2, threshold=0.5):
             time.sleep(0.8)
             self.controller.click(*self.controller.get_point(0.5, 0.5))
         self.match_template_and_click(self.winner, times = 25, delay = 5, threshold=0.5)
@@ -323,7 +352,6 @@ class AutoBattleTask(Task):
         for _ in range(6):
             time.sleep(1)
             self.controller.click(*self.controller.get_point(0.9, 0.9))
-        time.sleep(5)  # 等待 1 秒，确保界面稳定
         return True
 
     def check_and_run(self):
@@ -334,7 +362,7 @@ class AutoBattleTask(Task):
         while True:
             self.match_template_and_click(self.close_btn, times = 3, threshold=0.5)
             self.controller.drag(x1, y1, x2, y2, duration=0.2)
-            if not self.match_template_but_not_click(self.lock_golden, times = 5, delay = 1, threshold=0.5):
+            if not self.match_template_but_not_click(self.lock_golden, times = 10, delay = 1, threshold=0.5):
                 log("[自动战斗] 未检测到金色锁，将战斗最上面的关卡，结束自动战斗任务")
                 self.battle_point(self.controller.get_point(0.7, 0.3))
                 break

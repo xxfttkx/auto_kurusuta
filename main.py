@@ -25,6 +25,7 @@ TASKS = {
     "auto_battle": task.AutoBattleTask,
     "tower": task.TowerTask,
     "battle_task": task.BattleTask,
+    "daily_free_50": task.DailyFree50Task,
 }
 
 def main():
@@ -76,6 +77,7 @@ def run_tasks(selected_tasks=None):
         controller.add_task(task.RewardTask, "领取奖励")
         controller.add_task(task.DailyTask, "日常")
         controller.add_task(task.DailyRewardTask, "领取日常奖励")
+        controller.add_task(task.DailyFree50Task, "领取每日免费石")
     # controller.add_task(task.AutoBattleTask, "自动战斗")
     controller.run_once()  # 先运行一次，初始化任务状态
     log("所有任务完成")
