@@ -50,7 +50,7 @@ class Task:
             time.sleep(delay)
         return False
     
-    def match_template_and_click(self, image, times = 5, delay = 1, threshold=0.5, click_delay: float = 0.0):
+    def match_template_and_click(self, image, times = 5, delay = 1, threshold=0.5, click_delay: float = 0.5):
         count = 0
         image_path, image = image.path, image.image
         while count<times:
@@ -212,8 +212,8 @@ class TowerTask(Task):
     def check_and_run(self):
         if not self.enabled:
             return
-        self.match_template_and_click(self.quest_btn, click_delay = 0.5, threshold=0.5, times=15)
-        if self.match_template_and_click(self.tower, click_delay = 1, threshold=0.5, times=15):
+        self.match_template_and_click(self.quest_btn, threshold=0.5, times=15, click_delay = 1.0)
+        if self.match_template_and_click(self.tower, threshold=0.5, times=15, click_delay = 1.0):
             time.sleep(2)
             for pos in self.tower_btn_pos:
                 self.controller.click(*pos)
@@ -319,12 +319,14 @@ class DailyFree50Task(Task):
         self.home = Image("assets/home.png")
 
     def check_and_run(self):
-        self.match_template_and_click(self.shop, times = 10, threshold=0.5)
+        time.sleep(3)
+        self.match_template_and_click(self.shop, times = 10, threshold=0.5, click_delay = 1.0)
         self.match_template_and_click(self.school_store, times = 10, threshold=0.5)
         self.match_template_and_click(self.today_free, times = 10, threshold=0.5)
         self.match_template_and_click(self.free_50, times = 10, threshold=0.5)
         self.match_template_and_click(self.close_btn, times = 10, threshold=0.5)
         self.match_template_and_click(self.home, times = 10, threshold=0.5)
+        time.sleep(3)
         return True
 
 class AutoBattleTask(Task):
