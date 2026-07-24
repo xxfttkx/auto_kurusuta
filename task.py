@@ -321,7 +321,7 @@ class DailyFree50Task(Task):
     def check_and_run(self):
         time.sleep(3)
         self.match_template_and_click(self.shop, times = 10, threshold=0.5, click_delay = 1.0)
-        self.match_template_and_click(self.school_store, times = 10, threshold=0.5)
+        self.match_template_and_click(self.school_store, times = 10, threshold=1.0)
         self.match_template_and_click(self.today_free, times = 10, threshold=0.5)
         self.match_template_and_click(self.free_50, times = 10, threshold=0.5)
         self.match_template_and_click(self.close_btn, times = 10, threshold=0.5)
