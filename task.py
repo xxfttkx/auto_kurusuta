@@ -264,17 +264,17 @@ class BattleTask(Task):
     def check_and_run(self):
         if not self.enabled:
             return
-        while self.match_template_and_click(self.winner, times = 50, delay = 5, threshold=0.5,click_delay=2):
+        while self.match_template_and_click(self.winner, times = 50, delay = 5, threshold=0.5, click_delay=4):
             time.sleep(2)
-            self.controller.click(*self.controller.get_point(0.8, 0.8))
+            self.controller.click(*self.controller.get_point(0.7, 0.9))
             time.sleep(1)
-            self.controller.click(*self.controller.get_point(0.8, 0.8))
+            self.controller.click(*self.controller.get_point(0.7, 0.9))
             if not self.match_template_and_click(self.next_battle, times = 10, delay = 1, threshold=0.5,click_delay=1):
-                self.controller.click(*self.controller.get_point(0.8, 0.8))
+                self.controller.click(*self.controller.get_point(0.7, 0.9))
                 if not self.match_template_and_click(self.next_battle, times = 10, delay = 1, threshold=0.5,click_delay=1):
                     break
             if self.match_template_but_not_click(self.ready, times = 40, delay = 0.1, threshold=0.5):
-                time.sleep(0.8)
+                time.sleep(0.9)
                 self.controller.click(*self.controller.get_point(0.5, 0.5))
         return True
 
@@ -320,8 +320,8 @@ class DailyFree50Task(Task):
 
     def check_and_run(self):
         time.sleep(3)
-        self.match_template_and_click(self.shop, times = 10, threshold=0.5, click_delay = 1.0)
-        self.match_template_and_click(self.school_store, times = 10, threshold=1.0)
+        self.match_template_and_click(self.shop, times = 10, threshold=0.5, click_delay = 1.5)
+        self.match_template_and_click(self.school_store, times = 10, threshold=0.5, click_delay = 1.0)
         self.match_template_and_click(self.today_free, times = 10, threshold=0.5)
         self.match_template_and_click(self.free_50, times = 10, threshold=0.5)
         self.match_template_and_click(self.close_btn, times = 10, threshold=0.5)
