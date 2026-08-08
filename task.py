@@ -72,9 +72,9 @@ class Task:
                 if self.controller.is_testing:
                     cv2.rectangle(screenshot, (x, y), (x + w, y + h), (0, 255, 0), 2)
                     cv2.imwrite("debug_match.png", cv2.cvtColor(screenshot, cv2.COLOR_RGB2BGR))  # 或保存到文件
-                self.controller.click(x+int(w/2), y+int(h/2))
                 if click_delay > 0:
                     time.sleep(click_delay)
+                self.controller.click(x+int(w/2), y+int(h/2))
                 return True
             else:
                 if self.controller.is_testing:
@@ -320,7 +320,7 @@ class DailyFree50Task(Task):
 
     def check_and_run(self):
         time.sleep(3)
-        self.match_template_and_click(self.shop, times = 10, threshold=0.5, click_delay = 1.5)
+        self.match_template_and_click(self.shop, times = 10, threshold=0.5, click_delay = 2)
         self.match_template_and_click(self.school_store, times = 10, threshold=0.5, click_delay = 1.0)
         self.match_template_and_click(self.today_free, times = 10, threshold=0.5)
         self.match_template_and_click(self.free_50, times = 10, threshold=0.5)
