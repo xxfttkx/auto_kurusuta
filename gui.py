@@ -101,12 +101,15 @@ def start_gui():
     root = ctk.CTk()
     root.title("任务执行器")
     root.geometry("1360x820")
-    root.minsize(1080, 640)
     root.configure(fg_color=C_BG)
 
     running = {"flag": False}
     paused = {"flag": False}
     restarting = {"flag": False}
+
+    # 底部操作栏最先打包：窗口缩小时优先保住按钮不被挤掉
+    bottom = ctk.CTkFrame(root, fg_color="transparent")
+    bottom.pack(side="bottom", fill="x", padx=24, pady=(12, 18))
 
     # ========== 顶部标题 ==========
     header = ctk.CTkFrame(root, fg_color="transparent")
@@ -198,7 +201,7 @@ def start_gui():
         refresh_queue_label()
 
     def small_btn(text, cmd, fg, hover):
-        return ctk.CTkButton(btn_row, text=text, command=cmd, width=66, height=28,
+        return ctk.CTkButton(btn_row, text=text, command=cmd, width=60, height=28,
                              font=F(11), corner_radius=6,
                              fg_color=fg, hover_color=hover,
                              text_color_disabled="#8a93a6")
@@ -231,14 +234,10 @@ def start_gui():
     except Exception:
         pass  # 旧版 customtkinter 无 tag_config，仅丢失错误红色显示
 
-    # ========== 底部：状态栏 + 操作按钮 ==========
-    bottom = ctk.CTkFrame(root, fg_color="transparent")
-    bottom.pack(fill="x", padx=24, pady=(12, 18))
-
+    # ========== 底部：状态栏 + 操作按钮（bottom 已在开头打包）==========
+    # 状态栏只创建、暂不打包：等按钮打包完再排，窗口变窄时优先牺牲文字
     status_dot = ctk.CTkLabel(bottom, text="●", font=F(12), text_color=C_GREEN)
-    status_dot.pack(side="left")
     status_text = ctk.CTkLabel(bottom, text="空闲", font=F(11), text_color=C_DIM)
-    status_text.pack(side="left", padx=(6, 0))
 
     def set_running(is_running, task_names=None):
         running["flag"] = is_running
@@ -334,6 +333,10 @@ def start_gui():
     pause_btn.pack(side="right", padx=(0, 12))
     start_btn = main_btn("▶ 启动任务", start_selected_tasks, C_GREEN, C_GREEN_D, width=130)
     start_btn.pack(side="right", padx=(0, 12))
+
+    # 按钮占完空间后再排状态文字
+    status_dot.pack(side="left")
+    status_text.pack(side="left", padx=(6, 0))
 
     root.mainloop()
 
