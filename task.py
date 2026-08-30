@@ -1,3 +1,4 @@
+import random
 import threading
 import time
 from utils import log, click_window, screenshot_window, get_rgb_image
@@ -169,7 +170,8 @@ class DailyTask(Task):
         self.match_template_and_click(self.daily_2_btn, threshold=0.5, click_delay=0.8)
         self.match_template_and_click(self.skip_daily_2, threshold=0.5, click_delay=0.8)
         time.sleep(2)
-        self.controller.click(700, 420)
+        x = random.choice([339, 469, 595, 700, 840])
+        self.controller.click(x, 420)
         time.sleep(0.2)
         self.match_template_and_click(self.ok, threshold=0.5, click_delay=0.5)
         time.sleep(1)  # 等待 1 秒，确保界面稳定
