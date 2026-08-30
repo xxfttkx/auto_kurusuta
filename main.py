@@ -45,6 +45,10 @@ def main():
         for key in TASKS.keys():
             print(f"  {key}")
         sys.exit(0)
+    
+    print("CUDA 是否可用：", torch.cuda.is_available())
+    if torch.cuda.is_available():
+        print("GPU 名称：", torch.cuda.get_device_name(0))
 
     run_tasks(args.tasks)
 
@@ -54,9 +58,7 @@ def run_tasks(selected_tasks=None):
         log("请先启动游戏")
         time.sleep(10)
         target_window = find_target_window()
-        print("CUDA 是否可用：", torch.cuda.is_available())
-    if torch.cuda.is_available():
-        print("GPU 名称：", torch.cuda.get_device_name(0))
+        
     # screenshot_window(target_window)
     controller = TaskController(target_window)
     keyboard.add_hotkey('/', controller.exit_program)
@@ -76,11 +78,10 @@ def run_tasks(selected_tasks=None):
         controller.add_task(task.CloseTask, "关闭公告")
         controller.add_task(task.RewardTask, "领取奖励")
         controller.add_task(task.DailyTask, "日常")
-        controller.add_task(task.DailyRewardTask, "领取日常奖励")
         controller.add_task(task.DailyFree50Task, "领取每日免费石")
+        controller.add_task(task.DailyRewardTask, "领取日常奖励")
     # controller.add_task(task.AutoBattleTask, "自动战斗")
-    controller.run_once()  # 先运行一次，初始化任务状态
-    log("所有任务完成")
+    controller.run_once()
 
 if __name__ == '__main__':
     ctypes.windll.shcore.SetProcessDpiAwareness(2)

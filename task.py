@@ -13,7 +13,6 @@ class Task:
     def __init__(self, name, controller):
         self.name = name
         self.controller = controller
-        self.enabled = True   # 任务是否启用
     
     def check_and_run(self):
         """每个任务实现：判断是否该执行 + 执行操作"""
@@ -93,8 +92,6 @@ class EnterGameTask(Task):
         self.hai_btn = Image("assets/hai_button.png")
     
     def check_and_run(self):
-        if not self.enabled:
-            return
         self.match_template_and_click(self.start_btn)
         time.sleep(1)
         self.match_template_and_click(self.hai_btn)
@@ -108,8 +105,6 @@ class SkipTask(Task):
         self.skip_btn = Image("assets/skip_button.png")
 
     def check_and_run(self):
-        if not self.enabled:
-            return
         if self.match_template_but_not_click(self.skip_btn, times=100, delay=1, threshold=0.5):
             for i in range(10):  # 循环 10 次
                 if self.match_template_and_click(self.skip_btn, times = 5, threshold=0.5):
@@ -126,8 +121,6 @@ class CloseTask(Task):
         self.btn = Image("assets/close_btn.png")
 
     def check_and_run(self):
-        if not self.enabled:
-            return
         if self.match_template_but_not_click(self.btn, times=100, delay=1, threshold=0.5):
             for i in range(10):  # 循环 10 次
                 if self.match_template_and_click(self.btn, times = 5, threshold=0.5):
@@ -144,8 +137,6 @@ class RewardTask(Task):
         self.close_btn = Image("assets/close_btn.png")
 
     def check_and_run(self):
-        if not self.enabled:
-            return
         self.match_template_and_click(self.btn, threshold=0.5)
         time.sleep(5)  # 等待 1 秒，确保界面稳定
         self.match_template_and_click(self.close_btn, threshold=0.5)
@@ -165,8 +156,6 @@ class DailyTask(Task):
         self.home = Image("assets/home.png")
 
     def check_and_run(self):
-        if not self.enabled:
-            return
         self.match_template_and_click(self.quest_btn, threshold=0.5)
         self.match_template_and_click(self.daily_1_btn, threshold=0.5, click_delay=0.8)
         self.match_template_and_click(self.skip_daily_1, threshold=0.5, click_delay=0.8)
@@ -179,7 +168,7 @@ class DailyTask(Task):
         self.match_template_and_click(self.return_btn, threshold=0.5, click_delay=0.8)
         self.match_template_and_click(self.daily_2_btn, threshold=0.5, click_delay=0.8)
         self.match_template_and_click(self.skip_daily_2, threshold=0.5, click_delay=0.8)
-        time.sleep(1)
+        time.sleep(2)
         self.controller.click(700, 420)
         time.sleep(0.2)
         self.match_template_and_click(self.ok, threshold=0.5, click_delay=0.5)
@@ -210,8 +199,6 @@ class TowerTask(Task):
         self.stage_select = Image("assets/stage_select.png")
 
     def check_and_run(self):
-        if not self.enabled:
-            return
         self.match_template_and_click(self.quest_btn, threshold=0.5, times=15, click_delay = 1.0)
         if self.match_template_and_click(self.tower, threshold=0.5, times=15, click_delay = 1.0):
             time.sleep(2)
@@ -262,8 +249,6 @@ class BattleTask(Task):
         self.ready = Image("assets/ready.png")
 
     def check_and_run(self):
-        if not self.enabled:
-            return
         while self.match_template_and_click(self.winner, times = 50, delay = 5, threshold=0.5, click_delay=4):
             time.sleep(2)
             self.controller.click(*self.controller.get_point(0.7, 0.9))
@@ -285,8 +270,6 @@ class DailyRewardTask(Task):
         self.receive = Image("assets/receive.png")
 
     def check_and_run(self):
-        if not self.enabled:
-            return
         self.match_template_and_click(self.mission, threshold=0.5)
         time.sleep(1)  # 等待 1 秒，确保界面稳定
         self.match_template_and_click(self.receive, threshold=0.5)
@@ -357,8 +340,6 @@ class AutoBattleTask(Task):
         return True
 
     def check_and_run(self):
-        if not self.enabled:
-            return
         x1,y1 = self.controller.get_point(0.7, 0.38)
         x2,y2 = self.controller.get_point(0.7, 0.8)
         while True:
@@ -373,7 +354,7 @@ class AutoBattleTask(Task):
                 break
         return True
     
-class BackToHomeTask:
+class BackToHomeTask(Task):
     def __init__(self, name, controller):
         super().__init__(name, controller)
         self.home = Image("assets/home.png")

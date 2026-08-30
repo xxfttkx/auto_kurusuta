@@ -24,11 +24,12 @@ class TaskController:
         """每帧只运行当前任务"""
         while True:
             if self.current_task_index >= len(self.tasks):
-                return  # 全部任务完成
+                log("所有任务完成")
+                return
 
             current_task = self.tasks[self.current_task_index]
             finished = current_task.check_and_run()
-
+            time.sleep(1)
             if finished:  # 返回 True 表示任务完成
                 self.current_task_index += 1
 
