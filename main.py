@@ -29,6 +29,9 @@ TASKS = {
     "daily_free_50": task.DailyFree50Task,
 }
 
+# 默认任务队列（唯一数据源，GUI 的预填队列也来自这里）
+DEFAULT_TASKS = ["enter", "skip", "close", "reward", "daily", "daily_free_50", "tower"]
+
 def main():
     parser = argparse.ArgumentParser(description="任务执行器")
     parser.add_argument("tasks", nargs="*", help="要执行的任务（留空则执行全部）")
@@ -37,23 +40,18 @@ def main():
         action="store_true",
         help="列出所有可用任务"
     )
-
-
     args = parser.parse_args()
-
     if args.list:
         print("可用任务:")
         for key in TASKS.keys():
             print(f"  {key}")
         sys.exit(0)
-    
-    print("CUDA 是否可用：", torch.cuda.is_available())
-    if torch.cuda.is_available():
-        print("GPU 名称：", torch.cuda.get_device_name(0))
-
     run_tasks(args.tasks)
 
 def run_tasks(selected_tasks=None):
+    log("CUDA 是否可用：", torch.cuda.is_available())
+    if torch.cuda.is_available():
+        log("GPU 名称：", torch.cuda.get_device_name(0))
     global current_controller
     target_window = find_target_window()
     while target_window is None:
@@ -75,15 +73,9 @@ def run_tasks(selected_tasks=None):
             else:
                 log(f"未知任务: {name}")
     else:
-        # 没传参数，默认执行
-        controller.add_task(task.EnterGameTask, "进入游戏")
-        controller.add_task(task.SkipTask, "跳过奖励")
-        controller.add_task(task.CloseTask, "关闭公告")
-        controller.add_task(task.RewardTask, "领取奖励")
-        controller.add_task(task.DailyTask, "日常")
-        controller.add_task(task.DailyFree50Task, "领取每日免费石")
-        controller.add_task(task.DailyRewardTask, "领取日常奖励")
-    # controller.add_task(task.AutoBattleTask, "自动战斗")
+        # 没传参数，默认执行 DEFAULT_TASKS
+        for name in DEFAULT_TASKS:
+            controller.add_task(TASKS[name], name)
     controller.run_once()
 
 if __name__ == '__main__':

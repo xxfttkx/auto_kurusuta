@@ -7,7 +7,7 @@ import ctypes
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "libs"))
 
 import customtkinter as ctk
-from main import run_tasks, TASKS
+from main import run_tasks, TASKS, DEFAULT_TASKS
 import main as main_mod
 from task_controller import TaskStopped
 from utils import log
@@ -35,8 +35,6 @@ C_WARN     = "#f0b429"   # 运行中状态色
 
 FONT = "Microsoft YaHei UI"
 MONO = "Consolas"
-
-DEFAULT_TASKS = ["enter", "skip", "close", "reward", "daily", "daily_free_50", "tower"]
 
 
 def F(size, bold=False):
