@@ -209,3 +209,6 @@ debug_match_failed.png
 debug_match.png
 
 screenshots/
+
+# 项目内本地依赖（customtkinter）
+libs/
