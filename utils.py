@@ -13,10 +13,10 @@ import win32con
 import mss
 import ctypes
 
-def log(msg):
-    """带时间前缀的打印函数"""
+def log(*args):
+    """带时间前缀的打印函数，支持多个参数（以空格分隔，同 print）"""
     now = datetime.now().strftime("[%H:%M:%S]")
-    print(f"{now} {msg}")
+    print(f"{now} " + " ".join(str(a) for a in args))
 
 def move_window_to_top_left(win):
     hwnd = win._hWnd  # 获取窗口句柄
