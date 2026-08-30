@@ -14,6 +14,7 @@ import task
 
 
 # 可用任务映射表
+current_controller = None  # 当前运行中的控制器，供 GUI 暂停/重启使用
 TASKS = {
     "enter": task.EnterGameTask,
     "skip": task.SkipTask,
@@ -53,6 +54,7 @@ def main():
     run_tasks(args.tasks)
 
 def run_tasks(selected_tasks=None):
+    global current_controller
     target_window = find_target_window()
     while target_window is None:
         log("请先启动游戏")
@@ -61,6 +63,7 @@ def run_tasks(selected_tasks=None):
         
     # screenshot_window(target_window)
     controller = TaskController(target_window)
+    current_controller = controller
     keyboard.add_hotkey('/', controller.exit_program)
 
         # 根据参数添加任务

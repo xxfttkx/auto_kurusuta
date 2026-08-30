@@ -33,9 +33,9 @@ def find_target_window():
     all_windows = gw.getAllWindows()
     for w in all_windows:
         if w.title == "twinkle_starknightsX":
-            log("成功获取目标窗口")
+            log(f"成功获取目标窗口 {w.title}")
             return w
-    log("未找到游戏窗口")
+    log(f"未找到游戏窗口 {w.title}")
     return None
 
 def get_client_rect(win):

@@ -360,7 +360,7 @@ class BackToHomeTask(Task):
         self.home = Image("assets/home.png")
 
     def check_and_run(self):
-        self.match_template(self.home, threshold=0.5)
+        self.match_template_and_click(self.home, threshold=0.5)
         return True
 
 class DelayTask(Task):
