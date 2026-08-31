@@ -5,10 +5,12 @@
 import tkinter as tk
 import ctypes
 import sys
+import time
 
 import pyautogui
 import pygetwindow as gw
 import win32gui
+import win32con
 import keyboard
 
 BASE_W, BASE_H = 1280, 720
@@ -27,6 +29,7 @@ C_ACCENT   = "#3d7bff"
 C_ACCENT_D = "#2f63d0"
 C_GREEN    = "#1f9d55"
 C_GREEN_D  = "#178044"
+C_WARN     = "#f0b429"
 FONT = "Microsoft YaHei UI"
 MONO = "Consolas"
 
@@ -66,6 +69,16 @@ class CoordPicker:
         self.coord_label = tk.Label(self.root, text="( ---, --- )",
                                     font=(MONO, 20, "bold"), bg=C_BG, fg=C_DIM)
         self.coord_label.pack(pady=(6, 0))
+
+        res_frame = tk.Frame(self.root, bg=C_BG)
+        res_frame.pack(pady=(4, 2))
+        self.res_label = tk.Label(res_frame, text="窗口分辨率: --- × ---",
+                                  font=(MONO, 11), bg=C_BG, fg=C_DIM)
+        self.res_label.pack(side="left")
+        self.resize_btn = make_button(res_frame, "调整为 1280×720",
+                                      self._resize_to_base,
+                                      C_BTN, C_BTN_H, font_size=9, padx=8, pady=2)
+        self.resize_btn.pack(side="left", padx=(10, 0))
 
         self.win_label = tk.Label(self.root, text="未找到游戏窗口，启动游戏后自动连接",
                                   font=(FONT, 9), bg=C_BG, fg=C_DIM)
@@ -109,18 +122,64 @@ class CoordPicker:
         self.win_label.config(text="未找到游戏窗口，启动游戏后自动连接", fg=C_DIM)
         return None
 
+    def _get_client_size(self, hwnd):
+        left, top, right, bottom = win32gui.GetClientRect(hwnd)
+        return right - left, bottom - top
+
+    def _update_resolution_label(self, hwnd):
+        if not hwnd:
+            self.res_label.config(text="窗口分辨率: --- × ---", fg=C_DIM)
+            return
+        w, h = self._get_client_size(hwnd)
+        match = (w == BASE_W and h == BASE_H)
+        if match:
+            self.res_label.config(text=f"窗口分辨率: {w} × {h} ✓", fg=C_GREEN)
+        else:
+            self.res_label.config(text=f"窗口分辨率: {w} × {h}", fg=C_WARN if (w * h > 0) else C_DIM)
+
     def _to_logical(self):
         hwnd = self._get_hwnd()
+        self._update_resolution_label(hwnd)
         if not hwnd:
             return None
         sx, sy = pyautogui.position()
         cx, cy = win32gui.ScreenToClient(hwnd, (sx, sy))
-        left, top, right, bottom = win32gui.GetClientRect(hwnd)
-        w, h = right - left, bottom - top
+        w, h = self._get_client_size(hwnd)
         if w <= 0 or h <= 0:
             return None
         inside = 0 <= cx <= w and 0 <= cy <= h
         return round(cx * BASE_W / w), round(cy * BASE_H / h), inside
+
+    # ---------- 分辨率调整 ----------
+    def _resize_to_base(self):
+        hwnd = self._get_hwnd()
+        if not hwnd:
+            self._set_hint("未找到游戏窗口")
+            return
+        # 用当前窗口样式 + DWM 边框反推出外层窗口尺寸，保证客户区恰好 1280×720
+        style = win32gui.GetWindowLong(hwnd, win32con.GWL_STYLE)
+        ex_style = win32gui.GetWindowLong(hwnd, win32con.GWL_EXSTYLE)
+        # 不允许菜单栏占位（WS_CAPTION 只含标题栏，AdjustWindowRect 会考虑）
+        rect = ctypes.wintypes.RECT(0, 0, BASE_W, BASE_H)
+        ctypes.windll.user32.AdjustWindowRectEx(
+            ctypes.byref(rect), style, False, ex_style
+        )
+        outer_w = rect.right - rect.left
+        outer_h = rect.bottom - rect.top
+
+        # 把窗口定位到屏幕 (40, 40) 附近，保证不跑出屏外；不改变 Z 顺序
+        win32gui.SetWindowPos(
+            hwnd, 0,
+            40, 40, outer_w, outer_h,
+            win32con.SWP_NOZORDER | win32con.SWP_NOOWNERZORDER | win32con.SWP_SHOWWINDOW
+        )
+        # 验证一下客户区尺寸
+        time.sleep(0.1)
+        w, h = self._get_client_size(hwnd)
+        if w == BASE_W and h == BASE_H:
+            self._set_hint(f"已调整为 {BASE_W}×{BASE_H}")
+        else:
+            self._set_hint(f"已尝试调整，当前客户区 {w}×{h}")
 
     # ---------- 实时刷新 ----------
     def _poll(self):

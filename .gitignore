@@ -212,3 +212,5 @@ screenshots/
 
 # 项目内本地依赖（customtkinter）
 libs/
+
+test_post_click.py

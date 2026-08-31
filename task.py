@@ -197,7 +197,6 @@ class TowerTask(Task):
         self.auto_btn = [(969,44),(1062,78)]
         self.auto_color = (228, 244, 247)
         self.close = Image("assets/close.png")
-        self.ready = Image("assets/ready.png")
         self.stage_select = Image("assets/stage_select.png")
 
     def check_and_run(self):
@@ -217,9 +216,8 @@ class TowerTask(Task):
                         time.sleep(1)
                         if self.match_template_and_click(self.chuji, threshold=0.5):
                             for _ in range(5):
-                                if self.match_template_but_not_click(self.ready, times = 40, delay = 0.2, threshold=0.5):
-                                    time.sleep(0.8)
-                                    self.controller.click(*self.controller.get_point(0.5, 0.5))
+                                time.sleep(15)
+                                # todo: 判断战斗开始
                                 if self.controller.is_area_color(self.auto_btn[0], self.auto_btn[1], self.auto_color, tolerance=30, threshold_ratio=0.5):
                                     self.controller.click((self.auto_btn[0][0]+self.auto_btn[1][0])//2, (self.auto_btn[0][1]+self.auto_btn[1][1])//2)
                                 for i in range(30):
