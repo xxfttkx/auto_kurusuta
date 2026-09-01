@@ -202,10 +202,10 @@ class TowerTask(Task):
     def check_and_run(self):
         self.match_template_and_click(self.quest_btn, threshold=0.5, times=15, click_delay = 1.0)
         if self.match_template_and_click(self.tower, threshold=0.5, times=15, click_delay = 1.0):
-            time.sleep(2)
+            time.sleep(6)
             for pos in self.tower_btn_pos:
                 self.controller.click(*pos)
-                time.sleep(1)
+                time.sleep(2)
                 for _ in range(5):
                     success = False
                     if self.match_template_but_not_click(self.tower_word, times=3, threshold=0.7):
